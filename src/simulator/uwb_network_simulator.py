@@ -1,6 +1,7 @@
 import threading
 import time
 import random
+from src.utils import network
 
 SPEED_OF_LIGHT = 3E8
 
@@ -8,12 +9,14 @@ MIN_TOF = 0
 MAX_TOF = 10 / SPEED_OF_LIGHT  # 10 m
 
 MAX_DRONE_SPEED = 8  # m / s
-
 SYSTEM_DELAY = 10  # Hz
+
 MAX_NEW_DIST = MAX_DRONE_SPEED * SYSTEM_DELAY / SPEED_OF_LIGHT
 
 class UWBNetworkSimulator:
     def __init__(self, num_drones=3):
+        self.host, self.port = network.load_network_host()
+        
         self.threads = []
         for _ in range(num_drones):
             self.threads.append(threading.Thread(target=self.run))
@@ -47,4 +50,3 @@ class UWBNetworkSimulator:
         self._stop_event.set()
         for thread in self.threads:
             thread.join()
-        

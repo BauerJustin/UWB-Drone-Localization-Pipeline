@@ -1,6 +1,6 @@
-from src.utils import arg_parser
-from src.simulator import UWBNetworkSimulator
 import time
+from src.simulator import UWBNetworkSimulator
+from src.utils import arg_parser
 
 def main():
     args = arg_parser.parse()
