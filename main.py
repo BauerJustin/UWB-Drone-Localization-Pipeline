@@ -6,7 +6,7 @@ def main():
     args = arg_parser.parse()
 
     if args.sim_uwb:
-        print(f"Starting UWB simulator: {args.num_drones}")
+        print(f"Starting UWB simulator with {args.num_drones} drones")
         simulator = UWBNetworkSimulator(num_drones=args.num_drones)
         simulator.start()
 
@@ -19,7 +19,7 @@ def main():
         print("Terminated by user")
         if args.sim_uwb:
             simulator.stop()
-            print("UWB Simulator stopped")
+            print("UWB simulator stopped")
 
 if __name__ == "__main__":
     main()
