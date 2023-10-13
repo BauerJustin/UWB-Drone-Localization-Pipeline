@@ -7,7 +7,7 @@ def main():
 
     if args.sim_uwb:
         print(f"Starting UWB simulator with {args.num_drones} drones")
-        simulator = UWBNetworkSimulator(num_drones=args.num_drones)
+        simulator = UWBNetworkSimulator(num_drones=int(args.num_drones))
         simulator.start()
 
     try:

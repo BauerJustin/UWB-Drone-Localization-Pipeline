@@ -38,15 +38,28 @@ class UWBNetworkSimulator:
         for thread in self.threads:
             thread.start()
 
-    def run(self):
-        while not self._stop_event.is_set():
-            with self.lock:
-                for anchor in self.tofs[self.token].keys():
-                    self.tofs[self.token][anchor] += random.uniform(-MAX_NEW_DIST, MAX_NEW_DIST)
-                self.token = (self.token + 1) % self.num_drones
-            time.sleep(0.1)
-
     def stop(self):
         self._stop_event.set()
         for thread in self.threads:
             thread.join()
+
+    def run(self):
+        while not self._stop_event.is_set():
+            with self.lock:
+                self.update_tofs()
+                self.send_tofs()
+                self.token = (self.token + 1) % self.num_drones
+            time.sleep(0.1)
+
+    def update_tofs(self):
+        for anchor in self.tofs[self.token].keys():
+            self.tofs[self.token][anchor] += random.uniform(-MAX_NEW_DIST, MAX_NEW_DIST)
+
+    def send_tofs(self):
+        msg = {
+            'id': self.token,
+            'tofs': self.tofs[self.token]
+        }
+        print(msg)
+        # TODO Send msg to main localization pipeline
+        
