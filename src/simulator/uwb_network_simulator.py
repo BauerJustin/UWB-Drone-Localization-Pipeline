@@ -28,7 +28,6 @@ class UWBNetworkSimulator:
         print(f"[Simulator] Starting for {self.num_drones} drones")
         for thread in self.threads:
             thread.start()
-        
 
     def stop(self):
         self._stop_event.set()

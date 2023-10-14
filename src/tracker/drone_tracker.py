@@ -31,11 +31,11 @@ class DroneTracker:
         while not self.shutdown_event.is_set():
             drone_socket, drone_address = self.tracker_socket.accept()
             print(f"[Tracker] Drone connected to port {drone_address[1]}")
-            drone_thread = threading.Thread(target=self._handle_drone, args=(drone_socket,))
+            drone_thread = threading.Thread(target=self._handle_connection, args=(drone_socket,))
             drone_thread.start()
             self.drone_connections.append((drone_socket, drone_thread))
 
-    def _handle_drone(self, drone_socket):
+    def _handle_connection(self, drone_socket):
         try:
             while not self.shutdown_event.is_set():
                 data = drone_socket.recv(1024)

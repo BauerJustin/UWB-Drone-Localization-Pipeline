@@ -38,7 +38,7 @@ python3 main.py [--sim_uwb] [--num_drones N]
 ### Options
 
 - `--sim_uwb`: Use this flag to enable UWB drone simulation.
-- `--num_drones N` (Optional): Specify the number of drones for the simulation (default is 3 if not provided).
+- `--num_drones N`: Specify the number of drones for the simulation (default is 3 if not provided).
 
 ### Examples
 
