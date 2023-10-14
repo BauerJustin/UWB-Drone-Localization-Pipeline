@@ -18,14 +18,17 @@ MAX_NEW_DIST = MAX_DRONE_SPEED * SYSTEM_DELAY / SPEED_OF_LIGHT
 class UWBNetworkSimulator:
     def __init__(self, num_drones=3):
         self.num_drones = num_drones
-        
-        self._connect_to_sockets()
+        self.sockets = []
+        self.connection_lock = threading.Lock()
+
         self._init_threads()
         self._init_tofs()
 
     def start(self):
+        print(f"[Simulator] Starting for {self.num_drones} drones")
         for thread in self.threads:
             thread.start()
+        
 
     def stop(self):
         self._stop_event.set()
@@ -34,8 +37,12 @@ class UWBNetworkSimulator:
         for socket in self.sockets:
             if socket:
                 socket.close()
+        print("[Simulator] Terminated by user")
 
     def _run(self):
+        with self.connection_lock:
+            if len(self.sockets) == 0:
+                self._connect_to_sockets()
         while not self._stop_event.is_set():
             with self.lock:
                 self._update_tofs()
@@ -45,7 +52,6 @@ class UWBNetworkSimulator:
 
     def _connect_to_sockets(self):
         self.host, self.port = network.load_network_host()
-        self.sockets = []
 
         for i in range(self.num_drones):
             self.sockets.append(socket.socket(socket.AF_INET, socket.SOCK_STREAM))
@@ -55,7 +61,7 @@ class UWBNetworkSimulator:
                     self.sockets[i].connect((self.host, self.port))
                     connected = True
                 except:
-                    print(f'Failed to connect simulator to {self.host}:{self.port}')
+                    print(f'[Simulator] Failed to connect simulator to {self.host}:{self.port}')
                     time.sleep(1)
 
     def _init_threads(self):
@@ -88,7 +94,5 @@ class UWBNetworkSimulator:
         try:
             msg_json = json.dumps(msg)
             self.sockets[self.token].send(msg_json.encode('utf-8'))
-            response = self.socket.recv(1024)
-            print(f"Sent message: {msg_json}, Received response: {response.decode('utf-8')}")
         except Exception as e:
-            print(f"Error sending message: {str(e)}")
+            print(f"[Simulator] Error sending message: {str(e)}")
