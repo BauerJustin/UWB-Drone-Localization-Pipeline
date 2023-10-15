@@ -1,32 +1,18 @@
+import math
 import unittest
+from src import constants
 from src.algorithms import MultilaterationTOF
 from src.devices import AnchorNetwork
 
-test_anchors = {
-    "A1": {
-        "x": 0,
-        "y": 0,
-        "z": 0
-    },
-    "A2": {
-        "x": 5,
-        "y": 0,
-        "z": 5
-    },
-    "A3": {
-        "x": 0,
-        "y": 5,
-        "z": 5
-    },
-    "A4": {
-        "x": 5,
-        "y": 5,
-        "z": 5
-    }
-}
 
 class TestMultilaterationTOF(unittest.TestCase):
     def setUp(self):
+        test_anchors = {
+            "A1": {"x": 1, "y": 0, "z": 0},
+            "A2": {"x": 5, "y": 0, "z": 0},
+            "A3": {"x": 0, "y": 2, "z": 0},
+            "A4": {"x": 0, "y": 5, "z": 0}
+        }
         self.anchor_network = AnchorNetwork()
         for anchor_id, pos in test_anchors.items():
             self.anchor_network.add_anchor(anchor_id, pos['x'], pos['y'], pos['z'])
@@ -34,14 +20,14 @@ class TestMultilaterationTOF(unittest.TestCase):
 
     def test_calculate_position(self):
         tof_measurements = {
-            "A1": 0,
-            "A2": 0,
-            "A3": 0,
-            "A4": 0
+            "A1": math.sqrt(13) / constants.SPEED_OF_LIGHT,
+            "A2": math.sqrt(13) / constants.SPEED_OF_LIGHT,
+            "A3": math.sqrt(12) / constants.SPEED_OF_LIGHT,
+            "A4": math.sqrt(13) / constants.SPEED_OF_LIGHT
         }
         x, y, z = self.multilateration_tof.calculate_position(tof_measurements)
-        self.assertAlmostEqual(x, 0.5, places=6)
-        self.assertAlmostEqual(y, 0.5, places=6)
+        self.assertAlmostEqual(x, 3.0, places=6)
+        self.assertAlmostEqual(y, 3.0, places=6)
         self.assertAlmostEqual(z, 0.0, places=6)
 
 if __name__ == '__main__':
