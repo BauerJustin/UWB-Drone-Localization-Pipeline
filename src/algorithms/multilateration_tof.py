@@ -9,7 +9,7 @@ class MultilaterationTOF:
         self.anchor_network = anchor_network
         self.anchor_ids = anchor_network.get_anchor_ids()
 
-    def update_position(self, tof_measurements):
+    def calculate_position(self, tof_measurements):
         num_anchors = len(self.anchor_ids)
 
         # Ensure the number of ToF measurements matches the number of anchors

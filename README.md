@@ -53,3 +53,11 @@ python3 main.py [--sim_uwb] [--num_drones N]
    ```bash
    python3 main.py --sim_uwb --num_drones 5
    ```
+
+### Tests
+
+To run all unit tests use the following command:
+
+```bash
+python3 -m unittest discover
+```
