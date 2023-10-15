@@ -5,7 +5,8 @@ from src.utils import network
 
 
 class DroneSocket:
-    def __init__(self):
+    def __init__(self, tracker):
+        self.tracker = tracker
         self.host, self.port = network.load_network_host()
         self.tracker_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.drone_connections = []
@@ -49,7 +50,7 @@ class DroneSocket:
                 if not data:
                     break  # Connection closed
                 data = json.loads(data.decode('utf-8'))
-                print(f"[Socket] Received data from drone {data['id']}: {data['tofs']}")
+                self.tracker.update_drone(id=data['id'], tofs=data['tofs'])
         except Exception as e:
             if not self.shutdown_event.is_set():
                 print(f"[Socket] Handler error: {str(e)}")
