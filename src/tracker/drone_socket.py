@@ -1,13 +1,13 @@
 import json
 import socket
 import threading
-from src.utils import network
+from src.utils import load_config
 
 
 class DroneSocket:
     def __init__(self, tracker):
         self.tracker = tracker
-        self.host, self.port = network.load_network_host()
+        self.host, self.port = load_config.load_network_host()
         self.tracker_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.drone_connections = []
         self.listener_thread = threading.Thread(target=self._accept_connections)

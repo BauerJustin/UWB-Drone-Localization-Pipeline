@@ -3,17 +3,10 @@ import socket
 import threading
 import time
 import random
-from src.utils import network
+from src import constants
+from src.utils import load_config
 
-SPEED_OF_LIGHT = 3E8
-
-MIN_TOF = 0
-MAX_TOF = 10 / SPEED_OF_LIGHT  # 10 m
-
-MAX_DRONE_SPEED = 8  # m / s
-SYSTEM_DELAY = 10  # Hz
-
-MAX_NEW_DIST = MAX_DRONE_SPEED * SYSTEM_DELAY / SPEED_OF_LIGHT
+MAX_NEW_DIST = constants.MAX_DRONE_SPEED * constants.SYSTEM_DELAY / constants.SPEED_OF_LIGHT
 
 class UWBNetworkSimulator:
     def __init__(self, num_drones=3):
@@ -50,7 +43,8 @@ class UWBNetworkSimulator:
             time.sleep(0.1)
 
     def _connect_to_sockets(self):
-        self.host, self.port = network.load_network_host()
+        self.host, self.port = load_config.load_network_host()
+        time.sleep(1)
 
         for i in range(self.num_drones):
             self.sockets.append(socket.socket(socket.AF_INET, socket.SOCK_STREAM))
@@ -75,10 +69,10 @@ class UWBNetworkSimulator:
         self.tofs = []
         for _ in range(self.num_drones):
             self.tofs.append({
-                "A1": random.uniform(MIN_TOF, MAX_TOF),
-                "A2": random.uniform(MIN_TOF, MAX_TOF),
-                "A3": random.uniform(MIN_TOF, MAX_TOF),
-                "A4": random.uniform(MIN_TOF, MAX_TOF),
+                "A1": random.uniform(constants.MIN_TOF, constants.MAX_TOF),
+                "A2": random.uniform(constants.MIN_TOF, constants.MAX_TOF),
+                "A3": random.uniform(constants.MIN_TOF, constants.MAX_TOF),
+                "A4": random.uniform(constants.MIN_TOF, constants.MAX_TOF),
             })
 
     def _update_tofs(self):
