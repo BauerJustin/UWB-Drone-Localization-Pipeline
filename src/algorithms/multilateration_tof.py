@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.optimize import least_squares
 from src import constants
 
 
@@ -9,7 +10,15 @@ class MultilaterationTOF:
         self.anchor_network = anchor_network
         self.anchor_ids = anchor_network.get_anchor_ids()
 
-    def calculate_position(self, tof_measurements):
+    def calculate_position(self, tof_measurements, method="LinearLSE"):
+        if method == "LinearLSE":
+            return self._linear_LSE(tof_measurements)
+        elif method == "IterativeLSE":
+            return self._iterative_LSE(tof_measurements)
+        else:
+            raise ValueError(f"Invalid multilateration method: {method}")
+    
+    def _linear_LSE(self, tof_measurements):
         num_anchors = len(self.anchor_ids)
 
         # Ensure the number of ToF measurements matches the number of anchors
@@ -30,4 +39,29 @@ class MultilaterationTOF:
 
         x, y, z = estimated_position
         return x.item(), y.item(), z.item()
-    
+
+    def _iterative_LSE(self, tof_measurements, method="LSE"):
+        if len(self.anchor_ids) != 4 or len(tof_measurements) != 4:
+            raise ValueError("There must be 4 anchors and 4 time-of-flight measurements.")
+
+        tof = []
+        anchor_positions = []
+        for id in self.anchor_ids:
+            tof.append(tof_measurements[id])
+            anchor_positions.append(self.anchor_network.get_anchor_position(id))
+        tof = np.array(tof)
+        anchor_positions = np.array(anchor_positions)
+
+        squared_distances = (tof ** 2) * (constants.SPEED_OF_LIGHT ** 2)
+
+        def objective_function(object_position):
+            return np.sum((np.linalg.norm(anchor_positions - object_position, axis=1) ** 2) - squared_distances)
+
+        # Initial guess for object position
+        initial_guess = np.mean(anchor_positions, axis=0)
+
+        # Perform the least-squares optimization
+        result = least_squares(objective_function, initial_guess)
+
+        return result.x
+        

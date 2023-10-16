@@ -25,10 +25,11 @@ class TestMultilaterationTOF(unittest.TestCase):
             "A3": math.sqrt(12) / constants.SPEED_OF_LIGHT,
             "A4": math.sqrt(13) / constants.SPEED_OF_LIGHT
         }
-        x, y, z = self.multilateration_tof.calculate_position(tof_measurements)
-        self.assertAlmostEqual(x, 3.0, places=6)
-        self.assertAlmostEqual(y, 3.0, places=6)
-        self.assertAlmostEqual(z, 0.0, places=6)
+        x, y, z = self.multilateration_tof.calculate_position(tof_measurements, "IterativeLSE")
+        print(x, y, z)
+        self.assertAlmostEqual(x, 3.0)
+        self.assertAlmostEqual(y, 3.0)
+        self.assertAlmostEqual(z, 0.0)
 
 if __name__ == '__main__':
     unittest.main()
