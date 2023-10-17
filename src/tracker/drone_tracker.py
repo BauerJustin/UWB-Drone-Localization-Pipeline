@@ -16,7 +16,6 @@ class DroneTracker:
     def start(self):
         self.socket.start()
         print(f"[Tracker] Started")
-        self._track_drones()
 
     def stop(self):
         self.socket.stop()
@@ -29,7 +28,3 @@ class DroneTracker:
 
     def _add_drone(self, id):
         self.drones[id] = Drone(id=id, anchor_network=self.anchor_network)
-
-    def _track_drones(self):
-        while True:
-            time.sleep(5)

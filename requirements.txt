@@ -1,3 +1,5 @@
 argparse
+matplotlib
 numpy
 scipy
+tk
