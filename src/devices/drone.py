@@ -9,7 +9,6 @@ class Drone:
 
     def update_pos(self, tofs):
         self.x, self.y, self.z = self.multilaterator.calculate_position(tof_measurements=tofs)
-        print(f"[Drone-{self.id}] Update pos: {(self.x, self.y, self.z)}")
 
     def get_pos(self):
         return self.x, self.y, self.z
