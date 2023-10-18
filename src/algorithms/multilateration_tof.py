@@ -3,14 +3,12 @@ from scipy.optimize import least_squares
 from src import constants
 
 
-# TODO: Validate algorithm
-
 class MultilaterationTOF:
     def __init__(self, anchor_network):
         self.anchor_network = anchor_network
         self.anchor_ids = anchor_network.get_anchor_ids()
 
-    def calculate_position(self, tof_measurements, method="LinearLSE"):
+    def calculate_position(self, tof_measurements, method="IterativeLSE"):
         if method == "LinearLSE":
             return self._linear_LSE(tof_measurements)
         elif method == "IterativeLSE":

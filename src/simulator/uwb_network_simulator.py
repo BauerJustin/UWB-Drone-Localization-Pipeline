@@ -16,7 +16,7 @@ class UWBNetworkSimulator:
         self._init_trajectories()
 
     def start(self):
-        print(f"[Simulator] Starting for {self.num_drones} drones")
+        print(f"[Simulator] Starting for {self.num_drones} drone{'s' if self.num_drones > 1 else ''}")
         for thread in self.threads:
             thread.start()
 
