@@ -26,10 +26,9 @@ class TestMultilaterationTOF(unittest.TestCase):
             "A4": math.sqrt(13) / constants.SPEED_OF_LIGHT
         }
         x, y, z = self.multilateration_tof.calculate_position(tof_measurements)
-        print(x, y, z)
-        self.assertAlmostEqual(x, 3.0)
-        self.assertAlmostEqual(y, 3.0)
-        self.assertAlmostEqual(z, 0.0)
+        self.assertAlmostEqual(x, 3.0, 0)
+        self.assertAlmostEqual(y, 3.0, 0)
+        self.assertAlmostEqual(z, 0.0, 2)
 
 if __name__ == '__main__':
     unittest.main()

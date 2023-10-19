@@ -1,6 +1,6 @@
 from src.algorithms import MultilaterationTOF
 
-FILTER_ENABLED = True
+FILTER_ENABLED = False
 FILTER_RATE = 0.9
 
 class Drone:
@@ -12,7 +12,7 @@ class Drone:
 
     def update_pos(self, tofs):
         new_x, new_y, new_z = self.multilaterator.calculate_position(tof_measurements=tofs)
-        if self.x is None:
+        if not FILTER_ENABLED or self.x is None:
             self.x, self.y, self.z = new_x, new_y, new_z
         if FILTER_ENABLED:
             self.x = self.x * FILTER_RATE + new_x * (1 - FILTER_RATE)
