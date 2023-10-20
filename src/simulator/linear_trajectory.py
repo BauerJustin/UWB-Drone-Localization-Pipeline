@@ -1,9 +1,8 @@
 import copy
 import math
 import random
+from src import constants as const
 
-
-TRAJECTORY_PERCENTAGE_CHANGE = 0.01  # 1%
 
 class LinearTrajectory:
     def __init__(self, anchors):
@@ -48,7 +47,7 @@ class LinearTrajectory:
         # update pos each time by percentage
         for axis in ["x", "y", "z"]:
             difference = self.final_position[axis] - self.initial_position[axis]
-            self.position[axis] += TRAJECTORY_PERCENTAGE_CHANGE * difference
+            self.position[axis] += const.TRAJECTORY_PERCENTAGE_CHANGE * difference
 
         # randomize near position to move to
         squared_diffs = math.sqrt(sum([(self.final_position[key] - self.position[key]) ** 2 for key in self.position]))

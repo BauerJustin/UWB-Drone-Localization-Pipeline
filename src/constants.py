@@ -1,0 +1,6 @@
+# Drone Tracker Filters
+MOVING_AVG_FILTER_ENABLED = False
+MOVING_AVG_FILTER_RATE = 0.9
+
+# Simulator
+TRAJECTORY_PERCENTAGE_CHANGE = 0.01  # 1%

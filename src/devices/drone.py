@@ -1,8 +1,6 @@
 import math
 from src.algorithms import Multilateration
-
-FILTER_ENABLED = False
-FILTER_RATE = 0.9
+from src import constants as const
 
 class Drone:
     def __init__(self, id, anchor_network):
@@ -14,12 +12,12 @@ class Drone:
 
     def update_pos(self, measurements, ground_truth):
         new_x, new_y, new_z = self.multilaterator.calculate_position(measurements=measurements)
-        if not FILTER_ENABLED or self.x is None:
+        if not const.MOVING_AVG_FILTER_ENABLED or self.x is None:
             self.x, self.y, self.z = new_x, new_y, new_z
-        if FILTER_ENABLED:
-            self.x = self.x * FILTER_RATE + new_x * (1 - FILTER_RATE)
-            self.y = self.y * FILTER_RATE + new_y * (1 - FILTER_RATE)
-            self.z = self.z * FILTER_RATE + new_z * (1 - FILTER_RATE)
+        if const.MOVING_AVG_FILTER_ENABLED:
+            self.x = self.x * (1 - const.MOVING_AVG_FILTER_RATE) + new_x * const.MOVING_AVG_FILTER_RATE
+            self.y = self.y * (1 - const.MOVING_AVG_FILTER_RATE) + new_y * const.MOVING_AVG_FILTER_RATE
+            self.z = self.z * (1 - const.MOVING_AVG_FILTER_RATE) + new_z * const.MOVING_AVG_FILTER_RATE
         if ground_truth:
             self.has_ground_truth = True
             self.ground_truth = tuple(ground_truth.values())
