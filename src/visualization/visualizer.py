@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 
+PLOT_GROUND_TRUTH = False
+
 class Visualizer:
     def __init__(self, tracker):
         self.tracker = tracker
@@ -49,6 +51,16 @@ class Visualizer:
             self.scatter = self.ax.scatter(x, y, z, c='r', marker='o')
             self.ax.text(x, y, z, id, color='black')
             self._set_min_max_boundaries(x, y, z)
+
+            if drone.has_ground_truth:
+                if PLOT_GROUND_TRUTH:
+                    gt_x, gt_y, gt_z = drone.get_ground_truth()
+                    self.scatter = self.ax.scatter(gt_x, gt_y, gt_z, c='g', marker='o')
+                    self.ax.text(gt_x, gt_y, gt_z, f'{id}_gt', color='black')
+                
+                error = drone.get_euclid_dist()
+                if error >= 0.05:  # only show if error is above 5 cm
+                    self.ax.text(x, y, z-0.6, f"Error:{error:.1f}", color='black')
 
         self.ax.set_xlim(self.x_min, self.x_max)
         self.ax.set_ylim(self.y_min, self.y_max)

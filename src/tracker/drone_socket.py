@@ -50,7 +50,7 @@ class DroneSocket:
                 if not data:
                     break  # Connection closed
                 data = json.loads(data.decode('utf-8'))
-                self.tracker.update_drone(id=data['id'], measurements=data['measurements'])
+                self.tracker.update_drone(id=data['id'], measurements=data['measurements'], ground_truth=data['ground_truth'] if data['ground_truth'] else None)
         except Exception as e:
             if not self.shutdown_event.is_set():
                 print(f"[Socket] Handler error: {str(e)}")

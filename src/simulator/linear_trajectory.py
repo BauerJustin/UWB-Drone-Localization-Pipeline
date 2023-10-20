@@ -43,6 +43,8 @@ class LinearTrajectory:
                         (self.position["z"] - anchor["z"])**2)**0.5
             measurements[anchor_name] = distance
 
+        ground_truth = copy.copy(self.position)
+
         # update pos each time by percentage
         for axis in ["x", "y", "z"]:
             difference = self.final_position[axis] - self.initial_position[axis]
@@ -58,4 +60,4 @@ class LinearTrajectory:
                 "z": random.uniform(self.min_values["z"], self.max_values["z"])
             }
 
-        return measurements
+        return measurements, ground_truth

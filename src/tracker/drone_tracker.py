@@ -1,4 +1,3 @@
-import time
 from .drone_socket import DroneSocket
 from src.devices import AnchorNetwork, Drone
 from src.utils import load_config
@@ -21,10 +20,10 @@ class DroneTracker:
         self.socket.stop()
         print("[Tracker] Terminated by user")
 
-    def update_drone(self, id, measurements):
+    def update_drone(self, id, measurements, ground_truth=None):
         if id not in self.drones:
             self._add_drone(id)
-        self.drones[id].update_pos(measurements=measurements)
+        self.drones[id].update_pos(measurements=measurements, ground_truth=ground_truth)
 
     def _add_drone(self, id):
         self.drones[id] = Drone(id=id, anchor_network=self.anchor_network)

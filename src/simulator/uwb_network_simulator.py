@@ -67,9 +67,11 @@ class UWBNetworkSimulator:
         self.trajectories = [LinearTrajectory(anchors) for _ in range(self.num_drones)]
 
     def _get_and_send_measurements(self):
+        measurements, ground_truth = self.trajectories[self.token].get_measurements()
         msg = {
             'id': self.token,
-            'measurements': self.trajectories[self.token].get_measurements()
+            'measurements': measurements,
+            'ground_truth': ground_truth
         }
         try:
             msg_json = json.dumps(msg)
