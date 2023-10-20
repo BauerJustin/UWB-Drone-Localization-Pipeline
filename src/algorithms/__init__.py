@@ -1,1 +1,1 @@
-from .multilateration_tof import MultilaterationTOF
+from .multilateration import Multilateration

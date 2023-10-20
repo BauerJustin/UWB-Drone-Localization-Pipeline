@@ -1,7 +1,6 @@
 import copy
 import math
 import random
-from src import constants
 
 
 TRAJECTORY_PERCENTAGE_CHANGE = 0.01  # 1%
@@ -36,13 +35,13 @@ class LinearTrajectory:
             "z": random.uniform(self.min_values["z"], self.max_values["z"])
         }
 
-    def get_tofs(self):
-        tofs = {}
+    def get_measurements(self):
+        measurements = {}
         for anchor_name, anchor in self.anchors.items():
             distance = ((self.position["x"] - anchor["x"])**2 +
                         (self.position["y"] - anchor["y"])**2 +
                         (self.position["z"] - anchor["z"])**2)**0.5
-            tofs[anchor_name] = distance / constants.SPEED_OF_LIGHT
+            measurements[anchor_name] = distance
 
         # update pos each time by percentage
         for axis in ["x", "y", "z"]:
@@ -59,4 +58,4 @@ class LinearTrajectory:
                 "z": random.uniform(self.min_values["z"], self.max_values["z"])
             }
 
-        return tofs
+        return measurements

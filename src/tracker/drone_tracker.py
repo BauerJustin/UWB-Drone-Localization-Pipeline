@@ -21,10 +21,10 @@ class DroneTracker:
         self.socket.stop()
         print("[Tracker] Terminated by user")
 
-    def update_drone(self, id, tofs):
+    def update_drone(self, id, measurements):
         if id not in self.drones:
             self._add_drone(id)
-        self.drones[id].update_pos(tofs=tofs)
+        self.drones[id].update_pos(measurements=measurements)
 
     def _add_drone(self, id):
         self.drones[id] = Drone(id=id, anchor_network=self.anchor_network)

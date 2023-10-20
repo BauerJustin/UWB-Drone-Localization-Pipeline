@@ -1,17 +1,16 @@
 import numpy as np
 from scipy.optimize import minimize
-from src import constants
 
 
-class MultilaterationTOF:
+class Multilateration:
     def __init__(self, anchor_network):
         self.anchor_ids = anchor_network.get_anchor_ids()
         self.anchor_positions = np.array([anchor_network.get_anchor_position(id) for id in self.anchor_ids])
 
-    def calculate_position(self, tof_measurements):
-        # based on https://github.com/glucee/Multilateration/tree/master
+    def calculate_position(self, measurements):
+        # based on https://github.com/glucee/Multilateration
 
-        distances_to_station = np.array([tof_measurements[id] * constants.SPEED_OF_LIGHT for id in self.anchor_ids])
+        distances_to_station = np.array([measurements[id] for id in self.anchor_ids])
 
         l = len(self.anchor_positions)
         S = sum(distances_to_station)

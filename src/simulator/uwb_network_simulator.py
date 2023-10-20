@@ -35,7 +35,7 @@ class UWBNetworkSimulator:
                 self._connect_to_sockets()
         while not self._stop_event.is_set():
             with self.lock:
-                self._get_and_send_tofs()
+                self._get_and_send_measurements()
                 self.token = (self.token + 1) % self.num_drones
             time.sleep(0.1)
 
@@ -66,10 +66,10 @@ class UWBNetworkSimulator:
         anchors = load_config.load_anchor_positions()
         self.trajectories = [LinearTrajectory(anchors) for _ in range(self.num_drones)]
 
-    def _get_and_send_tofs(self):
+    def _get_and_send_measurements(self):
         msg = {
             'id': self.token,
-            'tofs': self.trajectories[self.token].get_tofs()
+            'measurements': self.trajectories[self.token].get_measurements()
         }
         try:
             msg_json = json.dumps(msg)
