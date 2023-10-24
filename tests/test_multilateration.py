@@ -14,7 +14,7 @@ class TestMultilateration(unittest.TestCase):
         }
         self.anchor_network = AnchorNetwork()
         for anchor_id, pos in test_anchors.items():
-            self.anchor_network.add_anchor(anchor_id, pos['x'], pos['y'], pos['z'])
+            self.anchor_network.add_anchor(anchor_id, **pos)
         self.multilateration = Multilateration(self.anchor_network)
 
     def test_calculate_position(self):
@@ -24,10 +24,10 @@ class TestMultilateration(unittest.TestCase):
             "A3": math.sqrt(12),
             "A4": math.sqrt(13)
         }
-        x, y, z = self.multilateration.calculate_position(measurements)
-        self.assertAlmostEqual(x, 3.0, 0)
-        self.assertAlmostEqual(y, 3.0, 0)
-        self.assertAlmostEqual(z, 0.0, 2)
+        pos = self.multilateration.calculate_position(measurements)
+        self.assertAlmostEqual(pos.x, 3.0, 0)
+        self.assertAlmostEqual(pos.y, 3.0, 0)
+        self.assertAlmostEqual(pos.z, 0.0, 2)
 
 if __name__ == '__main__':
     unittest.main()

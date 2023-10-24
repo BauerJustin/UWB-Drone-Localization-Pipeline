@@ -8,8 +8,8 @@ class AnchorNetwork:
         anchor = Anchor(id, x, y, z)
         self.anchors[id] = anchor
 
-    def get_anchor_position(self, id):
-        return self.anchors[id].get_position()
+    def get_anchor_pos(self, id):
+        return self.anchors[id].get_pos()
         
     def get_anchor_ids(self):
         return list(self.anchors.keys())

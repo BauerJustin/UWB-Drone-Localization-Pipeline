@@ -10,7 +10,7 @@ class DroneTracker:
         self.anchor_network = AnchorNetwork()
         anchors = load_config.load_anchor_positions()
         for anchor_id, pos in anchors.items():
-            self.anchor_network.add_anchor(anchor_id, pos['x'], pos['y'], pos['z'])
+            self.anchor_network.add_anchor(anchor_id, **pos)
 
     def start(self):
         self.socket.start()

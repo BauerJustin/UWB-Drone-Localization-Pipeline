@@ -41,13 +41,15 @@ class Visualizer:
         self.ax.set_ylabel('Y axis [m]')
         self.ax.set_zlabel('Z axis [m]')
         for id in self.tracker.anchor_network.get_anchor_ids():
-            x, y, z = self.tracker.anchor_network.get_anchor_position(id)
+            pos = self.tracker.anchor_network.get_anchor_pos(id)
+            x, y, z = pos.unpack()
             self.scatter = self.ax.scatter(x, y, z, c='b', marker='s')
             self.ax.text(x, y, z, id, color='black')
             self._set_min_max_boundaries(x, y, z)
 
         for id, drone in self.tracker.drones.items():
-            x, y, z = drone.get_pos()
+            pos = drone.get_pos()
+            x, y, z = pos.unpack()
             self.scatter = self.ax.scatter(x, y, z, c='r', marker='o')
             self.ax.text(x, y, z, id, color='black')
             self._set_min_max_boundaries(x, y, z)
