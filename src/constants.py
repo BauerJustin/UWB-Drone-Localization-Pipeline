@@ -1,5 +1,5 @@
 # Drone Tracker Filters
-FILTER_TYPE = "MA"  # MA (Moving Average), Kalman Filter (KF)
+FILTER_TYPE = "MA"  # MA (Moving Average), EKF (Kalman Filter), EKF (Extended Kalman Filter)
 
 # MA settings
 MOVING_AVG_FILTER_RATE = 0.9

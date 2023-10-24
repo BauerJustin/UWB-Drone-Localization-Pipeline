@@ -1,6 +1,6 @@
 import unittest
 from src.algorithms import Filter
-from src.algorithms.filters import MovingAverageFilter, KalmanFilter
+from src.algorithms.filters import MovingAverageFilter, KalmanFilter, ExtendedKalmanFilter
 from src.utils import Position
 
 
@@ -13,6 +13,10 @@ class TestFilter(unittest.TestCase):
         # Test initialization with KalmanFilter
         kf_filter = Filter("KF")
         self.assertIsInstance(kf_filter.filter, KalmanFilter)
+
+        # Test initialization with ExtendedKalmanFilter
+        ekf_filter = Filter("EKF")
+        self.assertIsInstance(ekf_filter.filter, ExtendedKalmanFilter)
 
 
 class TestMovingAverageFilter(unittest.TestCase):

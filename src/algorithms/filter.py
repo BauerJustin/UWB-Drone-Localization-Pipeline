@@ -1,6 +1,6 @@
-from .filters import MovingAverageFilter, KalmanFilter
+from .filters import MovingAverageFilter, KalmanFilter, ExtendedKalmanFilter
 
-filter_mapping = {"MA": MovingAverageFilter, "KF": KalmanFilter}
+filter_mapping = {"MA": MovingAverageFilter, "KF": KalmanFilter, "EKF": ExtendedKalmanFilter}
 
 class Filter:
     def __init__(self, filter_type):
