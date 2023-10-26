@@ -9,15 +9,17 @@ class Drone:
         self.anchor_network = anchor_network
 
         self.multilaterator = Multilateration(anchor_network=self.anchor_network)
-        self.filter = Filter(filter_type=const.FILTER_TYPE)
+        if const.FILTER_ENABLED:
+            self.filter = Filter(filter_type=const.FILTER_TYPE)
 
         self.has_ground_truth, self.ground_truth = None, None
 
     def update_pos(self, measurements, ground_truth):
         new_pos = self.multilaterator.calculate_position(measurements=measurements)
-        if not hasattr(self, "pos"):
+        if not const.FILTER_ENABLED or not hasattr(self, "pos"):
             self.pos = new_pos
-        self.filter.update_pos(self.pos, new_pos)
+        else:
+            self.filter.update_pos(self.pos, new_pos)
         if ground_truth:
             self.has_ground_truth = True
             self.ground_truth = Position(**ground_truth)
