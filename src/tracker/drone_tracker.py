@@ -21,9 +21,12 @@ class DroneTracker:
         print("[Tracker] Terminated by user")
 
     def update_drone(self, id, measurements, ground_truth=None):
-        if id not in self.drones:
-            self._add_drone(id)
-        self.drones[id].update_pos(measurements=measurements, ground_truth=ground_truth)
+        if len(measurements) == 4:
+            if id not in self.drones:
+                self._add_drone(id)
+            self.drones[id].update_pos(measurements=measurements, ground_truth=ground_truth)
+        else:
+            print(f'[Tracker] Drone {id} Invalid measurements len = {len(measurements)}, dropping packet')
 
     def _add_drone(self, id):
         self.drones[id] = Drone(id=id, anchor_network=self.anchor_network)
