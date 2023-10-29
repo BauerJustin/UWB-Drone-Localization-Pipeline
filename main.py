@@ -1,3 +1,4 @@
+from src.control import DroneController
 from src.simulator import UWBNetworkSimulator
 from src.tracker import DroneTracker
 from src.utils import arg_parser
@@ -14,6 +15,9 @@ def main():
         tracker = DroneTracker()
         tracker.start()
         
+        controller = DroneController()
+        controller.start()
+
         visualizer = Visualizer(tracker)
         visualizer.start()
 
