@@ -44,14 +44,14 @@ class Visualizer:
             pos = self.tracker.anchor_network.get_anchor_pos(id)
             x, y, z = pos.unpack()
             self.scatter = self.ax.scatter(x, y, z, c='b', marker='s')
-            self.ax.text(x, y, z, id, color='black')
+            self.ax.text(x, y, z, f"{id} ({x:.1f}, {y:.1f}, {z:.1f})", color='black')
             self._set_min_max_boundaries(x, y, z)
 
         for id, drone in self.tracker.drones.items():
             pos = drone.get_pos()
             x, y, z = pos.unpack()
             self.scatter = self.ax.scatter(x, y, z, c='r', marker='o')
-            self.ax.text(x, y, z, id, color='black')
+            self.ax.text(x, y, z, f"{id} ({x:.1f}, {y:.1f}, {z:.1f})", color='black')
             self._set_min_max_boundaries(x, y, z)
 
             if drone.has_ground_truth:
