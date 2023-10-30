@@ -15,6 +15,13 @@ class Visualizer:
         self.fig = plt.figure()
         self.ax = self.fig.add_subplot(111, projection='3d')
         self.scatter = self.ax.scatter([], [], [])
+                
+        self.label_frame = tk.Frame(self.root)
+        self.label_frame.pack(side=tk.RIGHT, anchor=tk.NE)
+        self.drone_labels = {}
+
+        self.dropped_label = tk.Label(self.label_frame)
+        self.dropped_label.pack(side=tk.TOP, anchor=tk.NE)
         
         self.canvas = self._get_tkinter_canvas()
         self.canvas.get_tk_widget().pack()
@@ -63,6 +70,14 @@ class Visualizer:
                 error = drone.get_euclid_dist()
                 if error >= 0.05:  # only show if error is above 5 cm
                     self.ax.text(x, y, z-0.6, f"Error:{error:.1f}", color='black')
+
+            if id not in self.drone_labels:
+                label = tk.Label(self.label_frame)
+                label.pack(side=tk.TOP, anchor=tk.NE)
+                self.drone_labels[id] = label
+            self.drone_labels[id].configure(text=f"Freq {id}: {drone.get_update_frequency():.2f} Hz")
+
+        self.dropped_label.configure(text=f"Dropped packets: {self.tracker.dropped_count}")
 
         self.ax.set_xlim(self.x_min, self.x_max)
         self.ax.set_ylim(self.y_min, self.y_max)
