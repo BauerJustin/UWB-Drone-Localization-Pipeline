@@ -2,9 +2,8 @@ import numpy as np
 import tkinter as tk
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from src import constants as const
 
-
-PLOT_GROUND_TRUTH = False
 
 class Visualizer:
     def __init__(self, tracker):
@@ -62,14 +61,14 @@ class Visualizer:
             self._set_min_max_boundaries(x, y, z)
 
             if drone.has_ground_truth:
-                if PLOT_GROUND_TRUTH:
-                    gt_x, gt_y, gt_z = drone.get_ground_truth()
-                    self.scatter = self.ax.scatter(gt_x, gt_y, gt_z, c='g', marker='o')
-                    self.ax.text(gt_x, gt_y, gt_z, f'{id}_gt', color='black')
-                
                 error = drone.get_euclid_dist()
                 if error >= 0.05:  # only show if error is above 5 cm
                     self.ax.text(x, y, z-0.6, f"Error:{error:.1f}", color='black')
+                    if const.PLOT_GROUND_TRUTH:
+                        gt = drone.get_ground_truth()
+                        gt_x, gt_y, gt_z = gt.unpack()
+                        self.scatter = self.ax.scatter(gt_x, gt_y, gt_z, c='g', marker='o')
+                        self.ax.text(gt_x, gt_y, gt_z, f'{id}_gt', color='black')
 
             if id not in self.drone_labels:
                 label = tk.Label(self.label_frame)

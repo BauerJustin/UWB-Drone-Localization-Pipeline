@@ -4,6 +4,8 @@ import threading
 import time
 from .linear_trajectory import LinearTrajectory
 from src.utils import load_config
+from src import constants as const
+
 
 class UWBNetworkSimulator:
     def __init__(self, num_drones=3):
@@ -28,7 +30,7 @@ class UWBNetworkSimulator:
             with self.lock:
                 self._get_and_send_measurements()
                 self.token = (self.token + 1) % self.num_drones
-            time.sleep(0.1)
+            time.sleep(1 / const.SIMULATOR_FREQUENCY)
 
     def _init_threads(self):
         self.threads = []

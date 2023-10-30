@@ -45,6 +45,7 @@ class TestMovingAverageFilter(unittest.TestCase):
         self.assertAlmostEqual(initial_pos.y, expected_y, places=5)
         self.assertAlmostEqual(initial_pos.z, expected_z, places=5)
 
+
 class TestKalmanFilter(unittest.TestCase):
     def setUp(self):
         self.kalman_filter = KalmanFilter()
