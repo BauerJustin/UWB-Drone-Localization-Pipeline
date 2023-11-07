@@ -19,6 +19,8 @@ class Drone:
         self.update_count = 0
         self.update_frequency = 0
 
+        self.active = False
+
     def update_pos(self, measurements, ground_truth):
         new_pos = self.multilaterator.calculate_position(measurements=measurements)
         if not const.FILTER_ENABLED or not hasattr(self, "pos"):
@@ -29,6 +31,7 @@ class Drone:
             self.has_ground_truth = True
             self.ground_truth = Position(**ground_truth)
         self._update_frequency()
+        self.active = True
 
     def get_pos(self):
         return self.pos

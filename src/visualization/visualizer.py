@@ -54,27 +54,28 @@ class Visualizer:
             self._set_min_max_boundaries(x, y, z)
 
         for id, drone in self.tracker.drones.items():
-            pos = drone.get_pos()
-            x, y, z = pos.unpack()
-            self.scatter = self.ax.scatter(x, y, z, c='r', marker='o')
-            self.ax.text(x, y, z, f"{id} ({x:.1f}, {y:.1f}, {z:.1f})", color='black')
-            self._set_min_max_boundaries(x, y, z)
+            if drone.active:
+                pos = drone.get_pos()
+                x, y, z = pos.unpack()
+                self.scatter = self.ax.scatter(x, y, z, c='r', marker='o')
+                self.ax.text(x, y, z, f"{id} ({x:.1f}, {y:.1f}, {z:.1f})", color='black')
+                self._set_min_max_boundaries(x, y, z)
 
-            if drone.has_ground_truth:
-                error = drone.get_euclid_dist()
-                if error >= 0.05:  # only show if error is above 5 cm
-                    self.ax.text(x, y, z-0.6, f"Error:{error:.1f}", color='black')
-                    if const.PLOT_GROUND_TRUTH:
-                        gt = drone.get_ground_truth()
-                        gt_x, gt_y, gt_z = gt.unpack()
-                        self.scatter = self.ax.scatter(gt_x, gt_y, gt_z, c='g', marker='o')
-                        self.ax.text(gt_x, gt_y, gt_z, f'{id}_gt', color='black')
+                if drone.has_ground_truth:
+                    error = drone.get_euclid_dist()
+                    if error >= 0.05:  # only show if error is above 5 cm
+                        self.ax.text(x, y, z-0.6, f"Error:{error:.1f}", color='black')
+                        if const.PLOT_GROUND_TRUTH:
+                            gt = drone.get_ground_truth()
+                            gt_x, gt_y, gt_z = gt.unpack()
+                            self.scatter = self.ax.scatter(gt_x, gt_y, gt_z, c='g', marker='o')
+                            self.ax.text(gt_x, gt_y, gt_z, f'{id}_gt', color='black')
 
-            if id not in self.drone_labels:
-                label = tk.Label(self.label_frame)
-                label.pack(side=tk.TOP, anchor=tk.NE)
-                self.drone_labels[id] = label
-            self.drone_labels[id].configure(text=f"Freq {id}: {drone.get_update_frequency():.2f} Hz")
+                if id not in self.drone_labels:
+                    label = tk.Label(self.label_frame)
+                    label.pack(side=tk.TOP, anchor=tk.NE)
+                    self.drone_labels[id] = label
+                self.drone_labels[id].configure(text=f"Freq {id}: {drone.get_update_frequency():.2f} Hz")
 
         self.dropped_label.configure(text=f"Dropped packets: {self.tracker.dropped_count}")
 
