@@ -1,6 +1,6 @@
 # Drone Tracker Filters
 FILTER_ENABLED = True
-FILTER_TYPE = "MA"  # MA (Moving Average), EKF (Kalman Filter), EKF (Extended Kalman Filter)
+FILTER_TYPE = "KF"  # MA (Moving Average), KF (Kalman Filter), EKF (Extended Kalman Filter)
 
 # MA settings
 MOVING_AVG_FILTER_RATE = 0.9
@@ -43,7 +43,12 @@ OBSERVATION_MATRIX = [
 
 # Simulator
 SIMULATOR_FREQUENCY = 10
-TRAJECTORY_PERCENTAGE_CHANGE = 0.01  # 1%
+TRAJECTORY_PERCENTAGE_CHANGE = 0.001  # 0.1%
 
 # Visualizer
 PLOT_GROUND_TRUTH = True
+
+# Outlier settings
+OUTLIER_PROBABILITY = 0.15  # Probability of injecting an outlier measurement (adjust as needed)
+OUTLIER_MULTIPLIER_MIN = 0.5  # Minimum multiplier for outlier measurements (adjust as needed)
+OUTLIER_MULTIPLIER_MAX = 2.0  # Maximum multiplier for outlier measurements (adjust as needed)

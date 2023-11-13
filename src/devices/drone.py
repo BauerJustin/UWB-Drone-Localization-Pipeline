@@ -3,6 +3,7 @@ import time
 from src.algorithms import Multilateration, Filter
 from src.utils import Position
 from src import constants as const
+import numpy as np
 
 class Drone:
     def __init__(self, id, anchor_network):
@@ -21,8 +22,8 @@ class Drone:
 
         self.active = False
 
-    def update_pos(self, measurements, ground_truth):
-        new_pos = self.multilaterator.calculate_position(measurements=measurements)
+    def update_pos(self, buffered_measurements, ground_truth):
+        new_pos = self.multilaterator.calculate_position_buffered_measurements(buffered_measurements=buffered_measurements)
         if not const.FILTER_ENABLED or not hasattr(self, "pos"):
             self.pos = new_pos
         else:
@@ -32,7 +33,7 @@ class Drone:
             self.ground_truth = Position(**ground_truth)
         self._update_frequency()
         self.active = True
-
+        
     def get_pos(self):
         return self.pos
 
