@@ -1,5 +1,6 @@
 import copy
 import math
+import numpy as np
 import random
 from src import constants as const
 
@@ -41,12 +42,12 @@ class LinearTrajectory:
                         (self.position["y"] - anchor["y"])**2 +
                         (self.position["z"] - anchor["z"])**2)**0.5
 
-            # Occasionally inject outlier measurements
-            if random.random() < const.OUTLIER_PROBABILITY:
+            if const.OUTLIER_INJECTION_ENABLED and random.random() < const.OUTLIER_PROBABILITY:
                 outlier_multiplier = random.uniform(const.OUTLIER_MULTIPLIER_MIN, const.OUTLIER_MULTIPLIER_MAX)
-                # print("original distance: ", distance)
                 distance *= outlier_multiplier
-                # print(f'distance with outlier {distance} outlier multiplier {outlier_multiplier}.')
+            elif const.ADD_GAUSSIAN_NOISE:
+                noise = np.random.normal(const.GAUSSIAN_NOISE_MEAN, const.GAUSSIAN_NOISE_STD)
+                distance += noise
 
             measurements[anchor_name] = distance
 
@@ -68,15 +69,3 @@ class LinearTrajectory:
             }
 
         return measurements, ground_truth
-
-    def get_buffered_measurements(self):
-        buffer_size = 10  # or any appropriate size
-        measurements_buffer = {anchor_name: [] for anchor_name in self.anchors}
-
-        for _ in range(buffer_size):
-            measurements, ground_truth = self.get_measurements()
-            for anchor_name, measurement in measurements.items():
-                measurements_buffer[anchor_name].append(measurement)
-
-        ground_truth = self.position  # Current position as ground truth
-        return measurements_buffer, ground_truth

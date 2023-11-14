@@ -12,7 +12,6 @@ class UWBNetworkSimulator:
         self.num_drones = num_drones
         self._init_threads()
         self._init_trajectories()
-        self.buffered_measurements = {}
 
     def start(self):
         print(f"[Simulator] Starting for {self.num_drones} drone{'s' if self.num_drones > 1 else ''}")
@@ -52,10 +51,10 @@ class UWBNetworkSimulator:
             self.sockets.append(socket.socket(socket.AF_INET, socket.SOCK_DGRAM))
 
     def _get_and_send_measurements(self):
-        self.buffered_measurements, ground_truth = self.trajectories[self.token].get_buffered_measurements()
+        measurements, ground_truth = self.trajectories[self.token].get_measurements()
         msg = {
             'id': self.token,
-            'buffered_measurements': self.buffered_measurements,
+            'measurements': measurements,
             'ground_truth': ground_truth
         }
         try:

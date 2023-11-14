@@ -10,6 +10,7 @@ class Visualizer:
         self.tracker = tracker
         self.root = tk.Tk()
         self.root.title("Drone Localization")
+        self.root.protocol("WM_DELETE_WINDOW", self._on_close)
 
         self.fig = plt.figure()
         self.ax = self.fig.add_subplot(111, projection='3d')
@@ -25,14 +26,18 @@ class Visualizer:
         self.canvas = self._get_tkinter_canvas()
         self.canvas.get_tk_widget().pack()
 
-        self.root.after(100, self._update)
-
     def start(self):
-        self.root.protocol("WM_DELETE_WINDOW", self._on_close)
-        self.root.mainloop()
+        print("[Visualizer] Started")
+        try:
+            self.root.after(100, self._update)
+            self.root.mainloop()
+        except Exception as e:
+            print(f"[Visualizer] Exception occurred: {e}")
+            self._on_close()
 
     def stop(self):
         self._on_close()
+        print("[Visualizer] Terminated by user")
 
     def _on_close(self):
         self.root.destroy()

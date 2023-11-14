@@ -1,7 +1,6 @@
 from .drone_socket import DroneSocket
 from src.devices import AnchorNetwork, Drone
 from src.utils import load_config
-from src.algorithms import Multilateration
 
 
 class DroneTracker:
@@ -22,13 +21,13 @@ class DroneTracker:
         self.socket.stop()
         print("[Tracker] Terminated by user")
 
-    def update_drone(self, id, buffered_measurements, ground_truth=None):
-        if len(buffered_measurements) == 4:
+    def update_drone(self, id, measurements, ground_truth=None):
+        if len(measurements) == 4:
             if id not in self.drones:
                 self._add_drone(id)
-            self.drones[id].update_pos(buffered_measurements=buffered_measurements, ground_truth=ground_truth)
+            self.drones[id].update_pos(measurements=measurements, ground_truth=ground_truth)
         else:
-            print(f'[Tracker] Drone {id} Invalid measurements len = {len(buffered_measurements)}, dropping packet')
+            print(f'[Tracker] Drone {id} Invalid measurements len = {len(measurements)}, dropping packet')
             self.dropped_count += 1
 
     def _add_drone(self, id):
