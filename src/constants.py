@@ -5,7 +5,6 @@ FILTER_TYPE = "KF"  # MA (Moving Average), KF (Kalman Filter), EKF (Extended Kal
 BUFFER_ENABLED = False
 BUFFER_SIZE = 10
 BUFFER_FILTER_OUTLIERS = True
-BUFFER_MIN_FILTER_LEN = 5
 
 # MA settings
 MOVING_AVG_FILTER_RATE = 0.9
@@ -54,7 +53,7 @@ ADD_GAUSSIAN_NOISE = True
 GAUSSIAN_NOISE_MEAN = 0.0
 GAUSSIAN_NOISE_STD = 0.01
 
-OUTLIER_INJECTION_ENABLED = False
+OUTLIER_INJECTION_ENABLED = True
 OUTLIER_PROBABILITY = 0.01  # Probability of injecting an outlier measurement
 OUTLIER_MULTIPLIER_MIN = 0.5  # Minimum multiplier for outlier measurements
 OUTLIER_MULTIPLIER_MAX = 2.0  # Maximum multiplier for outlier measurements

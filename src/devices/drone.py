@@ -14,7 +14,7 @@ class Drone:
         if const.FILTER_ENABLED:
             self.filter = Filter(filter_type=const.FILTER_TYPE)
         if const.BUFFER_ENABLED:
-            self.buffer = Buffer(size=const.BUFFER_SIZE, filter_outliers=const.BUFFER_FILTER_OUTLIERS, min_filter_len=const.BUFFER_MIN_FILTER_LEN)
+            self.buffer = Buffer(size=const.BUFFER_SIZE, filter_outliers=const.BUFFER_FILTER_OUTLIERS)
 
         self.has_ground_truth, self.ground_truth = None, None
 
