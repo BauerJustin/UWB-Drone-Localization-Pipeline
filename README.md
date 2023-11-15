@@ -3,7 +3,7 @@ ECE496 Capstone Indoor Drone Swarm Localization with UWB
 
 ## Prerequisites
 
-Before running the simulation, make sure you have the following prerequisites installed on your system:
+Before running the pipeline, make sure you have the following prerequisites installed on your system:
 
 - Python 3: You can download and install Python 3 from the [official website](https://www.python.org/downloads/).
 
@@ -29,16 +29,19 @@ Before running the simulation, make sure you have the following prerequisites in
 
 ## Usage
 
-You can run the UWB drone simulation with the following command:
+Run the UWB drone localization pipeline with the following command:
 
 ```bash
-python3 main.py [--sim_uwb] [--num_drones N]
+python3 main.py [--sim_uwb] [--num_drones N] [--capture] [--replay] [--file_name FILE]
 ```
 
 ### Options
 
 - `--sim_uwb`: Use this flag to enable UWB drone simulation.
 - `--num_drones N`: Specify the number of drones for the simulation (default is 3 if not provided).
+- `--capture`: Capture all incoming data.
+- `--replay`: Replay capture file.
+- `--file_name FILE`: Set the capture or replay file (default is capture.json).
 
 ### Examples
 
@@ -54,7 +57,31 @@ python3 main.py [--sim_uwb] [--num_drones N]
    python3 main.py --sim_uwb --num_drones 5
    ```
 
-### Tests
+3. To capture incoming data to default file (`capture.json`)
+
+   ```bash
+   python3 main.py --capture
+   ```
+
+4. To capture incoming data to specific file (e.g., `data_capture.json`)
+
+   ```bash
+   python3 main.py --capture --file_name data_capture.json
+   ```
+
+5. To replay data capture from default file (`capture.json`)
+    
+   ```bash
+   python3 main.py --replay
+   ```
+
+6. To replay data capture from specific file (e.g., `data_capture.json`)
+
+   ```bash
+   python3 main.py --replay --file_name data_capture.json
+   ```
+
+## Tests
 
 To run all unit tests use the following command:
 
