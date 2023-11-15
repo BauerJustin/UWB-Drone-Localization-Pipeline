@@ -4,8 +4,8 @@ from src.utils import load_config
 
 
 class DroneTracker:
-    def __init__(self):
-        self.socket = DroneSocket(tracker=self)
+    def __init__(self, capture=None):
+        self.socket = DroneSocket(tracker=self, capture=capture)
         self.drones = {}
         self.anchor_network = AnchorNetwork()
         anchors = load_config.load_anchor_positions()
