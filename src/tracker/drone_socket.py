@@ -50,7 +50,7 @@ class DroneSocket:
                 data, _ = self.tracker_socket.recvfrom(1024)
                 data = json.loads(data.decode('utf-8'))
                 self.tracker.update_drone(id=data['id'], measurements=data['measurements'], ground_truth=data['ground_truth'] if 'ground_truth' in data else None)
-                if self.capture:
+                if self.capture and not self.capture.replay:
                     self.captured_stream.append((time.time(), data))
             except Exception as e:
                 if self.shutdown_event.is_set():

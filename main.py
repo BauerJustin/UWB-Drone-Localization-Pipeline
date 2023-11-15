@@ -1,11 +1,11 @@
 from src.control import DroneController
 from src.simulator import UWBNetworkSimulator
 from src.tracker import DroneTracker
-from src.utils import arg_parser, StreamCapture
+from src.utils import Parser, StreamCapture
 from src.visualization import Visualizer
 
 def main():
-    args = arg_parser.parse()
+    args = Parser().parse()
 
     if args.sim_uwb:
         simulator = UWBNetworkSimulator(num_drones=int(args.num_drones))
@@ -13,8 +13,6 @@ def main():
     
     capture = None
     if args.capture or args.replay:
-        if args.capture and args.replay:
-            raise Exception("Can not Capture and Replay at the same time")
         capture = StreamCapture(args.file_name, replay=args.replay)
 
     try:
