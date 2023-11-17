@@ -11,10 +11,7 @@ class DroneController:
         drone_thread.start()
 
     def _move_drone(self):
-        # Initialize the Tello object
         tello = Tello()
-
-        # Connect to the drone
         tello.connect()
         print("Battery:", tello.get_battery(), "%")
 

@@ -1,4 +1,3 @@
-from src.control import DroneController
 from src.simulator import UWBNetworkSimulator
 from src.tracker import DroneTracker
 from src.utils import Parser, StreamCapture
@@ -18,9 +17,6 @@ def main():
     try:
         tracker = DroneTracker(capture=capture)
         tracker.start()
-        
-        controller = DroneController()
-        controller.start()
 
         visualizer = Visualizer(tracker)
         visualizer.start()
