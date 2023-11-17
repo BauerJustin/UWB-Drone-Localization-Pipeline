@@ -81,6 +81,25 @@ python3 main.py [--sim_uwb] [--num_drones N] [--capture] [--replay] [--file_name
    python3 main.py --replay --file_name data_capture.json
    ```
 
+## Drone Control
+
+Install the DJITelloPy (https://github.com/damiafuentes/DJITelloPy) package using either of the following options:
+
+### Install using pip
+
+```bash
+pip3 install djitellopy
+```
+
+### Install in developer mode
+The below commands allow you modify the library locally for your purposes.
+
+```bash
+git clone https://github.com/damiafuentes/DJITelloPy.git
+cd DJITelloPy
+pip install -e .
+```
+
 ## Tests
 
 To run all unit tests use the following command:
