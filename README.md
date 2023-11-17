@@ -100,6 +100,12 @@ cd DJITelloPy
 pip install -e .
 ```
 
+### Usage
+Drone control can be initiated by the same command used to run the UWB drone localization pipeline:
+```bash
+python3 main.py [--sim_uwb] [--num_drones N] [--capture] [--replay] [--file_name FILE]
+```
+
 ## Tests
 
 To run all unit tests use the following command:
