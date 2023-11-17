@@ -43,7 +43,7 @@ class LinearTrajectory:
                         (self.position["z"] - anchor["z"])**2)**0.5
 
             if const.OUTLIER_INJECTION_ENABLED and random.random() < const.OUTLIER_PROBABILITY:
-                outlier_multiplier = random.uniform(const.OUTLIER_MULTIPLIER_MIN, const.OUTLIER_MULTIPLIER_MAX)
+                outlier_multiplier = random.uniform(1/const.OUTLIER_MULTIPLIER, const.OUTLIER_MULTIPLIER)
                 distance *= outlier_multiplier
             elif const.ADD_GAUSSIAN_NOISE:
                 noise = np.random.normal(const.GAUSSIAN_NOISE_MEAN, const.GAUSSIAN_NOISE_STD)
