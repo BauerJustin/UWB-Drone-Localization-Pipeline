@@ -15,8 +15,6 @@ class StreamCapture:
                 stream = json.load(file)
                 return stream
         except FileNotFoundError:
-            print(f"File '{f'./captures/{self.file_name}'}' not found.")
-            return None
+            raise Exception(f"File '{f'./captures/{self.file_name}'}' not found.")
         except json.JSONDecodeError as e:
-            print(f"Error decoding JSON: {e}")
-            return None
+            raise Exception(f"Error decoding JSON: {e}")
