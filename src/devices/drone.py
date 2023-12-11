@@ -30,6 +30,8 @@ class Drone:
         if const.BUFFER_ENABLED:
             self.buffer.add(new_pos)
             new_pos = self.buffer.get_last_pos()
+            if new_pos is None:
+                return
         
         if not const.FILTER_ENABLED or not hasattr(self, "pos"):
             self.pos = new_pos

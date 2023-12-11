@@ -7,15 +7,20 @@ class Buffer:
         self.buffer = []
         self.size = size
         self.filter_outliers = filter_outliers
+        self.last_added = None
     
     def add(self, position):
         self.buffer.append(position)
+        self.last_added = position
         if len(self.buffer) > self.size:
             self.buffer.pop(0)            
 
     def get_last_pos(self):
         if self.filter_outliers:
-            return self._filter_outliers()[-1]
+            pos = self._filter_outliers()[-1]
+            if pos.unpack() != self.last_added.unpack():
+                return None
+            return pos
         else:
             return self.buffer[-1]
     
