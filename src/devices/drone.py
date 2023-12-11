@@ -25,7 +25,7 @@ class Drone:
         self.active = False
 
     def update_pos(self, measurements, ground_truth):
-        new_pos = self.multilaterator.calculate_position(measurements=measurements)
+        new_pos = self.multilaterator.calculate_position(measurements=measurements, last_pos=self.pos if hasattr(self, "pos") else None)
 
         if const.BUFFER_ENABLED:
             self.buffer.add(new_pos)

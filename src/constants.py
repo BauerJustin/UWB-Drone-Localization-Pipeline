@@ -6,6 +6,9 @@ BUFFER_ENABLED = True
 BUFFER_SIZE = 50
 BUFFER_FILTER_OUTLIERS = True
 
+# Multilateration settins
+USE_LAST_POS = True
+
 # MA settings
 MOVING_AVG_FILTER_RATE = 0.9
 
