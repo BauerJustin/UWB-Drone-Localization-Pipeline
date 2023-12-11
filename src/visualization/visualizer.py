@@ -64,7 +64,6 @@ class Visualizer:
                 x, y, z = pos.unpack()
                 self.scatter = self.ax.scatter(x, y, z, c='r', marker='o')
                 self.ax.text(x, y, z, f"{id} ({x:.1f}, {y:.1f}, {z:.1f})", color='black')
-                self._set_min_max_boundaries(x, y, z)
 
                 if drone.has_ground_truth:
                     error = drone.get_euclid_dist()
