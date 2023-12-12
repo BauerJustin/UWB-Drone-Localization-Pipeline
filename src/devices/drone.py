@@ -32,8 +32,8 @@ class Drone:
             new_pos = self.buffer.get_last_pos()
             if new_pos is None:
                 return
-        
-        if not const.FILTER_ENABLED or not hasattr(self, "pos"):
+
+        if not const.FILTER_ENABLED or not self.active:
             self.pos = new_pos
         else:
             self.filter.update_pos(self.pos, new_pos)
@@ -43,7 +43,8 @@ class Drone:
             self.ground_truth = Position(**ground_truth)
 
         self._update_frequency()
-        self.active = True
+        if self.update_count > 1:
+            self.active = True
 
     def get_pos(self):
         return self.pos
