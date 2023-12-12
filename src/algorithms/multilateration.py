@@ -9,7 +9,7 @@ class Multilateration:
         self.anchor_ids = anchor_network.get_anchor_ids()
         self.anchor_positions = np.array([anchor_network.get_anchor_pos(id).unpack() for id in self.anchor_ids])
 
-    def calculate_position(self, measurements, last_pos=None):
+    def calculate_position(self, measurements, timestamp, last_pos=None):
         # based on https://github.com/glucee/Multilateration
 
         distances_to_station = np.array([measurements[id] for id in self.anchor_ids])
@@ -33,4 +33,4 @@ class Multilateration:
         # Optimize the distance from the signal origin to the border of spheres
         result = minimize(error, x0, args=(self.anchor_positions, distances_to_station), method='Nelder-Mead')
 
-        return Position(*result.x)
+        return Position(*result.x, t=timestamp)

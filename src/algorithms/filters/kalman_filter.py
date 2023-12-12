@@ -11,9 +11,15 @@ class KalmanFilter:
     def update(self, pos, new_pos):
         self.state = np.array(pos.state())  # x
         self.covariance = np.array(pos.covariance)  # P
+        self._update_transition_matrix(pos, new_pos)
         self._kf_predict()
         self._kf_update(measurement=new_pos.unpack())
-        pos.update(*self.state, self.covariance)
+        pos.update(*self.state, self.covariance, new_pos.t)
+
+    def _update_transition_matrix(self, pos, new_pos):
+        self.delta_t = new_pos.t - pos.t
+        for i in range(3):
+            self.transition_matrix[i, i+3] = self.delta_t
 
     def _kf_predict(self):
         # x(k) = F * x(k-1)

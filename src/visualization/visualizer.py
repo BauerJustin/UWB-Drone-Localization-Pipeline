@@ -63,12 +63,12 @@ class Visualizer:
                 pos = drone.get_pos()
                 x, y, z = pos.unpack()
                 self.scatter = self.ax.scatter(x, y, z, c='r', marker='o')
-                self.ax.text(x, y, z, f"{id} ({x:.1f}, {y:.1f}, {z:.1f})", color='black')
+                self.ax.text(x, y, z, f"{id} ({x:.2f}, {y:.2f}, {z:.2f})", color='black')
 
                 if drone.has_ground_truth:
                     error = drone.get_euclid_dist()
                     if error >= 0.05:  # only show if error is above 5 cm
-                        self.ax.text(x, y, z-0.6, f"Error:{error:.1f}", color='black')
+                        self.ax.text(x, y, z-0.6, f"Error:{error:.2f}", color='black')
                         if const.PLOT_GROUND_TRUTH:
                             gt = drone.get_ground_truth()
                             gt_x, gt_y, gt_z = gt.unpack()

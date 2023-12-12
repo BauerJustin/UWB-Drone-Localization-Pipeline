@@ -21,11 +21,11 @@ class DroneTracker:
         self.socket.stop()
         print("[Tracker] Terminated by user")
 
-    def update_drone(self, id, measurements, ground_truth=None):
+    def update_drone(self, id, measurements, timestamp, ground_truth=None):
         if len(measurements) == 4:
             if id not in self.drones:
                 self._add_drone(id)
-            self.drones[id].update_pos(measurements=measurements, ground_truth=ground_truth)
+            self.drones[id].update_pos(measurements=measurements, timestamp=timestamp, ground_truth=ground_truth)
         else:
             print(f'[Tracker] Drone {id} Invalid measurements len = {len(measurements)}, dropping packet')
             self.dropped_count += 1

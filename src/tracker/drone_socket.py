@@ -49,10 +49,11 @@ class DroneSocket:
             try:
                 data, _ = self.tracker_socket.recvfrom(1024)
                 data = json.loads(data.decode('utf-8'))
-                self.tracker.update_drone(id=data['id'], measurements=data['measurements'], ground_truth=data['ground_truth'] if 'ground_truth' in data else None)
+                # TODO: Update timestamp to be from tag
+                self.tracker.update_drone(id=data['id'], measurements=data['measurements'], timestamp=time.time(), ground_truth=data['ground_truth'] if 'ground_truth' in data else None)
                 if self.capture and not self.capture.replay:
                     self.captured_stream.append((time.time(), data))
-            except Exception as e:
+            except:
                 if self.shutdown_event.is_set():
                     break
                 else:
@@ -71,7 +72,7 @@ class DroneSocket:
             curr_time, data = self.stream[i]
             if len(data['measurements']) != 4:  # Skip dropped packets
                 continue
-            self.tracker.update_drone(id=data['id'], measurements=data['measurements'], ground_truth=data['ground_truth'] if 'ground_truth' in data else None)
+            self.tracker.update_drone(id=data['id'], measurements=data['measurements'], timestamp=curr_time, ground_truth=data['ground_truth'] if 'ground_truth' in data else None)
             if i+1 < len(self.stream):
                 next_time, _ = self.stream[i+1]
                 time.sleep(next_time - curr_time)
