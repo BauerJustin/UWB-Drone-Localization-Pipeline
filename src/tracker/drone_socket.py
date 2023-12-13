@@ -73,6 +73,6 @@ class DroneSocket:
             if len(data['measurements']) != 4:  # Skip dropped packets
                 continue
             self.tracker.update_drone(id=data['id'], measurements=data['measurements'], timestamp=curr_time, ground_truth=data['ground_truth'] if 'ground_truth' in data else None)
-            if i+1 < len(self.stream):
+            if self.capture.live and i+1 < len(self.stream):
                 next_time, _ = self.stream[i+1]
                 time.sleep(next_time - curr_time)

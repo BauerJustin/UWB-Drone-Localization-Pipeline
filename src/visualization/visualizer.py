@@ -1,4 +1,3 @@
-import numpy as np
 import tkinter as tk
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -35,6 +34,25 @@ class Visualizer:
             print(f"[Visualizer] Exception occurred: {e}")
             self._on_close()
 
+    def plot_history(self):
+        print("[Visualizer] Plotting all points")
+        self.ax.clear()
+        self._plot_anchors()
+        colors = ['red', 'purple', 'magenta']
+        index = 0
+        for id, history in self.tracker.drones_history.items():
+            print(f'Drone {id} is color: {colors[index]}')
+            for pos in history:
+                self._plot_pos(pos, color=colors[index])
+            index += 1
+        self._plot_axes()
+        self.fig.canvas.draw()
+        try:
+            self.root.mainloop()
+        except Exception as e:
+            print(f"[Visualizer] Exception occurred: {e}")
+            self._on_close()
+
     def stop(self):
         self._on_close()
         print("[Visualizer] Terminated by user")
@@ -48,9 +66,15 @@ class Visualizer:
 
     def _update(self):
         self.ax.clear()
-        self.ax.set_xlabel('X axis [m]')
-        self.ax.set_ylabel('Y axis [m]')
-        self.ax.set_zlabel('Z axis [m]')
+        self._plot_anchors()
+        for id, drone in self.tracker.drones.items():
+            if drone.active:
+                self._plot_drone_with_metrics(id, drone)
+        self._plot_axes()
+        self.fig.canvas.draw()
+        self.root.after(100, self._update)
+
+    def _plot_anchors(self):
         for id in self.tracker.anchor_network.get_anchor_ids():
             pos = self.tracker.anchor_network.get_anchor_pos(id)
             x, y, z = pos.unpack()
@@ -58,45 +82,48 @@ class Visualizer:
             self.ax.text(x, y, z, f"{id} ({x:.1f}, {y:.1f}, {z:.1f})", color='black')
             self._set_min_max_boundaries(x, y, z)
 
-        for id, drone in self.tracker.drones.items():
-            if drone.active:
-                pos = drone.get_pos()
-                x, y, z = pos.unpack()
-                self.scatter = self.ax.scatter(x, y, z, c='r', marker='o')
-                self.ax.text(x, y, z, f"{id} ({x:.2f}, {y:.2f}, {z:.2f})", color='black')
+    def _plot_pos(self, pos, color='r'):
+        x, y, z = pos.unpack()
+        self.scatter = self.ax.scatter(x, y, z, c=color, marker='.')
 
-                if drone.has_ground_truth:
-                    error = drone.get_euclid_dist()
-                    if error >= 0.05:  # only show if error is above 5 cm
-                        self.ax.text(x, y, z-0.6, f"Error:{error:.2f}", color='black')
-                        if const.PLOT_GROUND_TRUTH:
-                            gt = drone.get_ground_truth()
-                            gt_x, gt_y, gt_z = gt.unpack()
-                            self.scatter = self.ax.scatter(gt_x, gt_y, gt_z, c='g', marker='o')
-                            self.ax.text(gt_x, gt_y, gt_z, f'{id}_gt', color='black')
+    def _plot_drone_with_metrics(self, id, drone):
+        pos = drone.get_pos()
+        x, y, z = pos.unpack()
+        self.scatter = self.ax.scatter(x, y, z, c='r', marker='o')
+        self.ax.text(x, y, z, f"{id} ({x:.2f}, {y:.2f}, {z:.2f})", color='black')
+        if drone.has_ground_truth:
+            error = drone.get_euclid_dist()
+            if error >= 0.05:  # only show if error is above 5 cm
+                self.ax.text(x, y, z-0.6, f"Error:{error:.2f}", color='black')
+                if const.PLOT_GROUND_TRUTH:
+                    gt = drone.get_ground_truth()
+                    gt_x, gt_y, gt_z = gt.unpack()
+                    self.scatter = self.ax.scatter(gt_x, gt_y, gt_z, c='g', marker='o')
+                    self.ax.text(gt_x, gt_y, gt_z, f'{id}_gt', color='black')
 
-                metrics = {}
-                metrics[f'Freq {id}'] = f'{drone.get_update_frequency():.2f} Hz'
-                drone_var = drone.get_variance()
-                metrics[f'X_var {id}'] = f'{drone_var[0]:.2f} m'
-                metrics[f'Y_var {id}'] = f'{drone_var[1]:.2f} m'
-                metrics[f'Z_var {id}'] = f'{drone_var[2]:.2f} m'
+        metrics = {}
+        metrics[f'Freq {id}'] = f'{drone.get_update_frequency():.2f} Hz'
+        drone_var = drone.get_variance()
+        metrics[f'X_var {id}'] = f'{drone_var[0]:.2f} m'
+        metrics[f'Y_var {id}'] = f'{drone_var[1]:.2f} m'
+        metrics[f'Z_var {id}'] = f'{drone_var[2]:.2f} m'
 
-                for title, metric in metrics.items():
-                    if title not in self.drone_labels:
-                        label = tk.Label(self.label_frame)
-                        label.pack(side=tk.TOP, anchor=tk.NE)
-                        self.drone_labels[title] = label
-                    self.drone_labels[title].configure(text=f"{title}: {metric}")
+        for title, metric in metrics.items():
+            if title not in self.drone_labels:
+                label = tk.Label(self.label_frame)
+                label.pack(side=tk.TOP, anchor=tk.NE)
+                self.drone_labels[title] = label
+            self.drone_labels[title].configure(text=f"{title}: {metric}")
 
         self.dropped_label.configure(text=f"Dropped packets: {self.tracker.dropped_count}")
 
+    def _plot_axes(self):
+        self.ax.set_xlabel('X axis [m]')
+        self.ax.set_ylabel('Y axis [m]')
+        self.ax.set_zlabel('Z axis [m]')
         self.ax.set_xlim(self.x_min, self.x_max)
         self.ax.set_ylim(self.y_min, self.y_max)
         self.ax.set_zlim(self.z_min, self.z_max)
-
-        self.fig.canvas.draw()
-        self.root.after(100, self._update)
 
     def _set_min_max_boundaries(self, x, y, z):
         self.x_min = min(self.x_min if hasattr(self, 'x_min') else 0, x)

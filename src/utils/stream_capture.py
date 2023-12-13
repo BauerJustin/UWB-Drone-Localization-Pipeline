@@ -1,9 +1,10 @@
 import json
 
 class StreamCapture:
-    def __init__(self, file_name, replay=False):
+    def __init__(self, file_name, replay=False, live=True):
         self.file_name = file_name
         self.replay = replay
+        self.live = live
 
     def write_stream(self, stream):
         with open(f'./captures/{self.file_name}', "w") as file:
