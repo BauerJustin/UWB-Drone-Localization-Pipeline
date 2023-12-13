@@ -75,11 +75,19 @@ class Visualizer:
                             self.scatter = self.ax.scatter(gt_x, gt_y, gt_z, c='g', marker='o')
                             self.ax.text(gt_x, gt_y, gt_z, f'{id}_gt', color='black')
 
-                if id not in self.drone_labels:
-                    label = tk.Label(self.label_frame)
-                    label.pack(side=tk.TOP, anchor=tk.NE)
-                    self.drone_labels[id] = label
-                self.drone_labels[id].configure(text=f"Freq {id}: {drone.get_update_frequency():.2f} Hz")
+                metrics = {}
+                metrics[f'Freq {id}'] = f'{drone.get_update_frequency():.2f} Hz'
+                drone_var = drone.get_variance()
+                metrics[f'X_var {id}'] = f'{drone_var[0]:.2f} m'
+                metrics[f'Y_var {id}'] = f'{drone_var[1]:.2f} m'
+                metrics[f'Z_var {id}'] = f'{drone_var[2]:.2f} m'
+
+                for title, metric in metrics.items():
+                    if title not in self.drone_labels:
+                        label = tk.Label(self.label_frame)
+                        label.pack(side=tk.TOP, anchor=tk.NE)
+                        self.drone_labels[title] = label
+                    self.drone_labels[title].configure(text=f"{title}: {metric}")
 
         self.dropped_label.configure(text=f"Dropped packets: {self.tracker.dropped_count}")
 

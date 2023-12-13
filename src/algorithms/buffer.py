@@ -33,6 +33,12 @@ class Buffer:
             poses = np.array([p.unpack() for p in self.buffer])
             avg_pos = np.mean(poses, axis=0)
             return Position(*avg_pos)
+        
+    def get_buffer_variance(self):
+        pos_list = np.array([pos.unpack() for pos in self.buffer])
+        median = np.median(pos_list, axis=0)
+        deviation = np.median(np.abs(pos_list - median), axis=0)
+        return deviation
 
     def _filter_outliers(self):
         pos_list = np.array([pos.unpack() for pos in self.buffer])

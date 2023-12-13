@@ -1,3 +1,4 @@
+import copy
 import math
 import time
 from src.algorithms import Multilateration, Filter, Buffer
@@ -15,12 +16,16 @@ class Drone:
             self.filter = Filter(filter_type=const.FILTER_TYPE)
         if const.BUFFER_ENABLED:
             self.buffer = Buffer(size=const.BUFFER_SIZE, filter_outliers=const.BUFFER_FILTER_OUTLIERS)
+        if const.MEASURE_VARIANCE:
+            self.variance_buffer = Buffer(size=const.VARIANCE_SIZE)
 
         self.has_ground_truth, self.ground_truth = None, None
 
         self.last_update_time = None
         self.update_count = 0
         self.update_frequency = 0
+
+        self.variance = None
 
         self.active = False
 
@@ -42,6 +47,7 @@ class Drone:
             self.has_ground_truth = True
             self.ground_truth = Position(**ground_truth)
 
+        self._update_variance()
         self._update_frequency()
         if self.update_count > 1:
             self.active = True
@@ -51,6 +57,9 @@ class Drone:
 
     def get_update_frequency(self):
         return self.update_frequency
+    
+    def get_variance(self):
+        return self.variance
 
     def get_ground_truth(self):
         return self.ground_truth
@@ -66,3 +75,8 @@ class Drone:
 
         self.last_update_time = current_time
         self.update_count += 1
+
+    def _update_variance(self):
+        self.variance_buffer.add(copy.copy(self.pos))
+        self.variance = self.variance_buffer.get_buffer_variance()
+        

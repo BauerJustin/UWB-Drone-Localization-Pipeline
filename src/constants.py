@@ -6,6 +6,9 @@ BUFFER_ENABLED = True
 BUFFER_SIZE = 50
 BUFFER_FILTER_OUTLIERS = True
 
+MEASURE_VARIANCE = True
+VARIANCE_SIZE = 5
+
 # Multilateration settins
 USE_LAST_POS = True
 
