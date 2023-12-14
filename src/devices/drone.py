@@ -30,7 +30,7 @@ class Drone:
         self.active = False
 
     def update_pos(self, measurements, timestamp, ground_truth):
-        new_pos = self.multilaterator.calculate_position(measurements=measurements, timestamp=timestamp, last_pos=self.pos if hasattr(self, "pos") else None)
+        new_pos = self.multilaterator.calculate_position(measurements=measurements, timestamp=timestamp, last_pos=self.pos if self.active else None)
 
         if const.BUFFER_ENABLED:
             self.buffer.add(new_pos)
@@ -49,8 +49,7 @@ class Drone:
 
         self._update_variance()
         self._update_frequency()
-        if self.update_count > 1:
-            self.active = True
+        self.active = self.update_count > const.FIRST_UPDATES_SKIPPED
 
     def get_pos(self):
         return self.pos

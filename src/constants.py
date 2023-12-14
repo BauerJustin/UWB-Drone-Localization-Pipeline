@@ -1,4 +1,6 @@
 # Drone Tracker
+FIRST_UPDATES_SKIPPED = 5
+
 FILTER_ENABLED = True
 FILTER_TYPE = "KF"  # MA (Moving Average), KF (Kalman Filter), EKF (Extended Kalman Filter)
 
