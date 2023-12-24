@@ -1,10 +1,13 @@
 # Drone Tracker
+BASE = "pos"  # pos, measurement
+
 FIRST_UPDATES_SKIPPED = 5
 
 FILTER_ENABLED = True
 FILTER_TYPE = "KF"  # MA (Moving Average), KF (Kalman Filter), EKF (Extended Kalman Filter)
 
 BUFFER_ENABLED = True
+BUFFER_MODE = 'last'  # avg, last
 BUFFER_SIZE = 50
 BUFFER_FILTER_OUTLIERS = True
 

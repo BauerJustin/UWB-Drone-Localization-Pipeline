@@ -2,6 +2,7 @@ import math
 import unittest
 from src.algorithms import Multilateration
 from src.devices import AnchorNetwork
+from src.utils import Measurements
 
 
 class TestMultilateration(unittest.TestCase):
@@ -18,12 +19,7 @@ class TestMultilateration(unittest.TestCase):
         self.multilateration = Multilateration(self.anchor_network)
 
     def test_calculate_position(self):
-        measurements = {
-            "81": math.sqrt(13),
-            "82": math.sqrt(13),
-            "83": math.sqrt(12),
-            "84": math.sqrt(13)
-        }
+        measurements = Measurements(math.sqrt(13), math.sqrt(13), math.sqrt(12), math.sqrt(13))
         pos = self.multilateration.calculate_position(measurements)
         self.assertAlmostEqual(pos.x, 3.0, 0)
         self.assertAlmostEqual(pos.y, 3.0, 0)

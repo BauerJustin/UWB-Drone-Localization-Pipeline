@@ -1,7 +1,7 @@
 import copy
 from .drone_socket import DroneSocket
 from src.devices import AnchorNetwork, Drone
-from src.utils import load_config
+from src.utils import load_config, Measurements
 
 
 class DroneTracker:
@@ -33,7 +33,7 @@ class DroneTracker:
         if len(measurements) == 4:
             if id not in self.drones:
                 self._add_drone(id)
-            self.drones[id].update_pos(measurements=measurements, timestamp=timestamp, ground_truth=ground_truth)
+            self.drones[id].update_pos(measurements=Measurements(*[m for _, m in sorted(measurements.items(), key=lambda x: int(x[0]))], t=timestamp), ground_truth=ground_truth)
             if self.history:
                 self.drones_history[id].append(copy.copy(self.drones[id].pos))
         else:

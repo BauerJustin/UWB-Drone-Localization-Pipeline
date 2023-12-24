@@ -8,16 +8,16 @@ class KalmanFilter:
         self.transition_matrix = np.array(const.TRANSITION_MATRIX)  # F
         self.observation_matrix = np.array(const.OBSERVATION_MATRIX)  # H
     
-    def update(self, pos, new_pos):
-        self.state = np.array(pos.state())  # x
-        self.covariance = np.array(pos.covariance)  # P
-        self._update_transition_matrix(pos, new_pos)
+    def update(self, state, measurement):
+        self.state = np.array(state.state())  # x
+        self.covariance = np.array(state.covariance)  # P
+        self._update_transition_matrix(state, measurement)
         self._kf_predict()
-        self._kf_update(measurement=new_pos.unpack())
-        pos.update(*self.state, self.covariance, new_pos.t)
+        self._kf_update(measurement.unpack())
+        state.update(*self.state, self.covariance, measurement.t)
 
-    def _update_transition_matrix(self, pos, new_pos):
-        self.delta_t = new_pos.t - pos.t
+    def _update_transition_matrix(self, state, measurement):
+        self.delta_t = measurement.t - state.t
         for i in range(3):
             self.transition_matrix[i, i+3] = self.delta_t
 

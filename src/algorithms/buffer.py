@@ -1,50 +1,50 @@
 import numpy as np
-from src.utils import Position
+from src.utils import Position, Measurements
 
 
 class Buffer:
-    def __init__(self, size, filter_outliers=False):
+    def __init__(self, base_type, size, filter_outliers=False):
+        self.base_type = base_type
         self.buffer = []
         self.size = size
         self.filter_outliers = filter_outliers
         self.last_added = None
     
-    def add(self, position):
-        self.buffer.append(position)
-        self.last_added = position
+    def add(self, value):
+        self.buffer.append(value)
+        self.last_added = value
         if len(self.buffer) > self.size:
-            self.buffer.pop(0)            
+            self.buffer.pop(0)
 
-    def get_last_pos(self):
+    def get_last(self):
         if self.filter_outliers:
-            pos = self._filter_outliers()[-1]
-            if pos.unpack() != self.last_added.unpack():
+            value = self._filter_outliers()[-1]
+            if value.unpack() != self.last_added.unpack():
                 return None
-            return pos
+            return value
         else:
             return self.buffer[-1]
-    
-    def get_avg_pos(self):
-        if self.filter_outliers:
-            poses = np.array([p.unpack() for p in self._filter_outliers()])
-            avg_pos = np.mean(poses, axis=0)
-            return Position(*avg_pos)
+
+    def get_avg(self):
+        values = np.array([p.unpack() for p in (self._filter_outliers() if self.filter_outliers else self.buffer)])
+        avg_value = np.mean(values, axis=0)
+        if self.base_type == 'pos':
+            return Position(*avg_value)
+        elif self.base_type == 'measurement':
+            return Measurements(*avg_value)
         else:
-            poses = np.array([p.unpack() for p in self.buffer])
-            avg_pos = np.mean(poses, axis=0)
-            return Position(*avg_pos)
+            raise Exception(f"Invalid buffer base: {self.base_type}")
         
     def get_buffer_variance(self):
-        pos_list = np.array([pos.unpack() for pos in self.buffer])
-        median = np.median(pos_list, axis=0)
-        deviation = np.median(np.abs(pos_list - median), axis=0)
+        values = np.array([p.unpack() for p in self.buffer])
+        median = np.median(values, axis=0)
+        deviation = np.median(np.abs(values - median), axis=0)
         return deviation
 
     def _filter_outliers(self):
-        pos_list = np.array([pos.unpack() for pos in self.buffer])
-        median = np.median(pos_list, axis=0)
-        deviation = np.median(np.abs(pos_list - median), axis=0)
+        values = np.array([p.unpack() for p in self.buffer])
+        median = np.median(values, axis=0)
+        deviation = np.median(np.abs(values - median), axis=0)
         threshold = 3 * deviation
-        filtered_buffer = [pos for pos in self.buffer if np.all(np.abs(np.array(pos.unpack()) - median) <= threshold)]
+        filtered_buffer = [p for p in self.buffer if np.all(np.abs(np.array(p.unpack()) - median) <= threshold)]
         return filtered_buffer
-    
