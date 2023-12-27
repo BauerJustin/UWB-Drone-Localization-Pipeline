@@ -17,7 +17,7 @@ class DroneTracker:
         self.dropped_count = 0
 
         self.history = False
-        if not capture.live:
+        if capture and not capture.live:
             self.history = True
             self.drones_history = {}
 

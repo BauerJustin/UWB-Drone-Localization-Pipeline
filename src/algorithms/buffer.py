@@ -18,7 +18,10 @@ class Buffer:
 
     def get_last(self):
         if self.filter_outliers:
-            value = self._filter_outliers()[-1]
+            filtered_buffer = self._filter_outliers()
+            if len(filtered_buffer) == 0:
+                return None
+            value = filtered_buffer[-1]
             if value.unpack() != self.last_added.unpack():
                 return None
             return value
