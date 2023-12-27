@@ -3,7 +3,6 @@ import numpy as np
 from src.algorithms import Filter
 from src.algorithms.filters import MovingAverageFilter, KalmanFilter, ExtendedKalmanFilter
 from src.utils import Position
-from src import constants as const
 
 
 class TestFilter(unittest.TestCase):
@@ -53,8 +52,22 @@ class TestKalmanFilter(unittest.TestCase):
     def test_kf_predict(self):
         initial_state = np.array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
         initial_covariance = np.eye(6)
-        transition_matrix = np.array(const.TRANSITION_MATRIX)
-        process_noise = np.array(const.PROCESS_NOISE)
+        transition_matrix = np.array([
+            [1.0, 0.0, 0.0, 0.1, 0.0, 0.0],
+            [0.0, 1.0, 0.0, 0.0, 0.1, 0.0],
+            [0.0, 0.0, 1.0, 0.0, 0.0, 0.1],
+            [0.0, 0.0, 0.0, 1.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0, 0.0, 1.0, 0.0],
+            [0.0, 0.0, 0.0, 0.0, 0.0, 1.0]
+        ])
+        process_noise = np.array([
+            [0.01, 0.0, 0.0, 0.01, 0.0, 0.0],
+            [0.0, 0.01, 0.0, 0.0, 0.01, 0.0],
+            [0.0, 0.0, 0.01, 0.0, 0.0, 0.01],
+            [0.01, 0.0, 0.0, 0.01, 0.0, 0.0],
+            [0.0, 0.01, 0.0, 0.0, 0.01, 0.0],
+            [0.0, 0.0, 0.01, 0.0, 0.0, 0.01]
+        ])
 
         self.kalman_filter.state = initial_state
         self.kalman_filter.covariance = initial_covariance
@@ -73,8 +86,16 @@ class TestKalmanFilter(unittest.TestCase):
         initial_state = np.array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
         initial_covariance = np.eye(6)
         measurement = np.array([7.0, 8.0, 9.0])
-        observation_matrix = np.array(const.OBSERVATION_MATRIX)
-        measurement_noise = np.array(const.MEASUREMENT_NOISE)
+        observation_matrix = np.array([
+            [1.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            [0.0, 1.0, 0.0, 0.0, 0.0, 0.0],
+            [0.0, 0.0, 1.0, 0.0, 0.0, 0.0]
+        ])
+        measurement_noise = np.array([
+            [0.1, 0.0, 0.0],
+            [0.0, 0.1, 0.0],
+            [0.0, 0.0, 0.1]
+        ])
 
         self.kalman_filter.state = initial_state
         self.kalman_filter.covariance = initial_covariance
