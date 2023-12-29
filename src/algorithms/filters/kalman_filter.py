@@ -1,25 +1,27 @@
 import numpy as np
 from src import constants as const
+from src.utils import load_config
 
 class KalmanFilter:
     def __init__(self):
-        self.process_noise = np.array(const.PROCESS_NOISE)  # Q
-        self.measurement_noise = np.array(const.MEASUREMENT_NOISE)  # R
-        self.transition_matrix = np.array(const.TRANSITION_MATRIX)  # F
-        self.observation_matrix = np.array(const.OBSERVATION_MATRIX)  # H
+        kf_settings = load_config.load_kf_settings(const.BASE)
+        self.process_noise = np.array(kf_settings['PROCESS_NOISE'])  # Q
+        self.measurement_noise = np.array(kf_settings['MEASUREMENT_NOISE'])  # R
+        self.transition_matrix = np.array(kf_settings['TRANSITION_MATRIX'])  # F
+        self.observation_matrix = np.array(kf_settings['OBSERVATION_MATRIX'])  # H
     
-    def update(self, pos, new_pos):
-        self.state = np.array(pos.state())  # x
-        self.covariance = np.array(pos.covariance)  # P
-        self._update_transition_matrix(pos, new_pos)
+    def update(self, state, measurement):
+        self.state = np.array(state.state())  # x
+        self.covariance = np.array(state.covariance)  # P
+        self._update_transition_matrix(state, measurement)
         self._kf_predict()
-        self._kf_update(measurement=new_pos.unpack())
-        pos.update(*self.state, self.covariance, new_pos.t)
+        self._kf_update(measurement.unpack())
+        state.update(*self.state, self.covariance, measurement.t)
 
-    def _update_transition_matrix(self, pos, new_pos):
-        self.delta_t = new_pos.t - pos.t
-        for i in range(3):
-            self.transition_matrix[i, i+3] = self.delta_t
+    def _update_transition_matrix(self, state, measurement):
+        self.delta_t = measurement.t - state.t
+        for i in range(len(self.transition_matrix[0])//2):
+            self.transition_matrix[i, i+len(self.transition_matrix[0])//2] = self.delta_t
 
     def _kf_predict(self):
         # x(k) = F * x(k-1)
@@ -35,4 +37,4 @@ class KalmanFilter:
         # x(k) = x(k) + K * (Z - H * x(k))
         self.state = self.state + np.dot(kalman_gain, (measurement - np.dot(self.observation_matrix, self.state)))
         # P(k) = (I - K * H) * P(k)
-        self.covariance = np.dot((np.eye(6) - np.dot(kalman_gain, self.observation_matrix)), self.covariance)
+        self.covariance = np.dot((np.eye(len(self.observation_matrix[0])) - np.dot(kalman_gain, self.observation_matrix)), self.covariance)

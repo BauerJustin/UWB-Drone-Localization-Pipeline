@@ -8,5 +8,5 @@ class Filter:
         self.filter_type = filter_type
         self.filter = filter_mapping[self.filter_type]()
 
-    def update_pos(self, pos, new_pos):
-        self.filter.update(pos, new_pos)
+    def update(self, state, measurement):
+        self.filter.update(state, measurement)

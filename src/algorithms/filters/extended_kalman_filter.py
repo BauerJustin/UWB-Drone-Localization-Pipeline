@@ -1,10 +1,12 @@
 import numpy as np
 from .kalman_filter import KalmanFilter
-from src import constants as const
+from src.utils import load_config
 
 class ExtendedKalmanFilter(KalmanFilter):
     def __init__(self):
         super().__init__()
+        anchors = load_config.load_anchor_positions()
+        self.anchor_positions = np.array([list(v.values()) for v in anchors.values()])
 
     def _kf_update(self, measurement):
         # Calculate the Jacobian matrix for the measurement model at the current state estimate
@@ -17,12 +19,26 @@ class ExtendedKalmanFilter(KalmanFilter):
         # x(k) = x(k) + K * (Z - H * x(k))
         self.state = self.state + np.dot(kalman_gain, (measurement - self._calculate_measurement_model()))
         # P(k) = (I - K * H) * P(k)
-        self.covariance = np.dot((np.eye(6) - np.dot(kalman_gain, self.observation_matrix)), self.covariance)
+        self.covariance = np.dot((np.eye(len(self.observation_matrix[0])) - np.dot(kalman_gain, self.observation_matrix)), self.covariance)
 
     def _calculate_jacobian(self):
-        # TODO Currently linear
-        return np.array(const.OBSERVATION_MATRIX)
+        jacobian = np.zeros((len(self.anchor_positions), len(self.state)))
+        for i, anchor in enumerate(self.anchor_positions):
+            dx = self.state[0] - anchor[0]
+            dy = self.state[1] - anchor[1]
+            dz = self.state[2] - anchor[2]
+            dist = np.sqrt(dx**2 + dy**2 + dz**2)
+            
+            if dist > 0:
+                jacobian[i, 0] = dx / dist
+                jacobian[i, 1] = dy / dist
+                jacobian[i, 2] = dz / dist
+        return jacobian
 
     def _calculate_measurement_model(self):
-        # TODO Currently linear
-        return np.dot(self.observation_matrix, self.state)
+        measurement_model = np.zeros(len(self.anchor_positions))
+        for i, anchor in enumerate(self.anchor_positions):
+            measurement_model[i] = np.sqrt((self.state[0] - anchor[0])**2 + 
+                                           (self.state[1] - anchor[1])**2 + 
+                                           (self.state[2] - anchor[2])**2)
+        return measurement_model

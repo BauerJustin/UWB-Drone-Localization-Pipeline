@@ -1,7 +1,10 @@
 from src import constants as const
+from src.utils import load_config
+
+kf_settings = load_config.load_kf_settings(const.BASE)
 
 class Position:
-    def __init__(self, x=None, y=None, z=None, x_dot=0.0, y_dot=0.0, z_dot=0.0, covariance=const.INITIAL_COVARIANCE, t=None):
+    def __init__(self, x=None, y=None, z=None, x_dot=0.0, y_dot=0.0, z_dot=0.0, covariance=kf_settings['INITIAL_COVARIANCE'], t=None):
         self.x = x
         self.y = y
         self.z = z
