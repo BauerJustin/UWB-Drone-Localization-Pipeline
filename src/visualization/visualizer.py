@@ -1,6 +1,7 @@
 import tkinter as tk
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import numpy as np
 from src import constants as const
 
 
@@ -38,13 +39,14 @@ class Visualizer:
         print("[Visualizer] Plotting all points")
         self.ax.clear()
         self._plot_anchors()
-        colors = ['red', 'purple', 'magenta']
-        index = 0
-        for id, history in self.tracker.drones_history.items():
-            print(f'Drone {id} is color: {colors[index]}')
+        for history in self.tracker.drones_history.values():
+            x_points, y_points, z_points = [], [], []
             for pos in history:
-                self._plot_pos(pos, color=colors[index])
-            index += 1
+                x, y, z = pos.unpack()
+                x_points.append(x)
+                y_points.append(y)
+                z_points.append(z)
+            self.scatter = self.ax.scatter(x_points, y_points, z_points, c=np.linspace(0, 1, len(x_points)), cmap=plt.cm.RdYlGn, marker='.')
         self._plot_axes()
         self.fig.canvas.draw()
         try:
@@ -81,10 +83,6 @@ class Visualizer:
             self.scatter = self.ax.scatter(x, y, z, c='b', marker='s')
             self.ax.text(x, y, z, f"{id} ({x:.1f}, {y:.1f}, {z:.1f})", color='black')
             self._set_min_max_boundaries(x, y, z)
-
-    def _plot_pos(self, pos, color='r'):
-        x, y, z = pos.unpack()
-        self.scatter = self.ax.scatter(x, y, z, c=color, marker='.')
 
     def _plot_drone_with_metrics(self, id, drone):
         pos = drone.get_pos()
