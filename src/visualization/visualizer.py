@@ -35,7 +35,7 @@ class Visualizer:
             print(f"[Visualizer] Exception occurred: {e}")
             self._on_close()
 
-    def plot_history(self):
+    def plot_history(self, plot_best_fit=False):
         print("[Visualizer] Plotting all points")
         self.ax.clear()
         self._plot_anchors()
@@ -47,6 +47,14 @@ class Visualizer:
                 y_points.append(y)
                 z_points.append(z)
             self.scatter = self.ax.scatter(x_points, y_points, z_points, c=np.linspace(0, 1, len(x_points)), cmap=plt.cm.RdYlGn, marker='.')
+            if plot_best_fit:
+                X = np.column_stack((x_points, y_points, np.ones(len(x_points))))
+                params = np.linalg.lstsq(X, z_points, rcond=None)[0]
+                x_fit = np.linspace(min(x_points), max(x_points), 100)
+                y_fit = np.linspace(min(y_points), max(y_points), 100)
+                x_fit, y_fit = np.meshgrid(x_fit, y_fit)
+                z_fit = params[0] * x_fit + params[1] * y_fit + params[2]
+                self.ax.plot_surface(x_fit, y_fit, z_fit, alpha=0.5, rstride=100, cstride=100, color='blue')
         self._plot_axes()
         self.fig.canvas.draw()
         try:
