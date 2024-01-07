@@ -15,7 +15,8 @@ class Drone:
         if const.FILTER_ENABLED:
             self.filter = Filter(filter_type=const.FILTER_TYPE)
         if const.BUFFER_ENABLED:
-            self.buffer = Buffer(base_type=const.BASE, size=const.BUFFER_SIZE, filter_outliers=const.BUFFER_FILTER_OUTLIERS)
+            self.buffer = Buffer(base_type=const.BASE, size=const.BUFFER_SIZE, filter_outliers=const.BUFFER_FILTER_OUTLIERS,
+                                            outlier_rejection_version=const.OUTLIER_REJECTION_VERSION, outlier_replacement=const.OUTLIER_REPLACEMENT_ENABLED)
         if const.MEASURE_VARIANCE:
             self.variance_buffer = Buffer(base_type="pos", size=const.VARIANCE_SIZE)
 
@@ -113,4 +114,3 @@ class Drone:
     def _update_variance(self):
         self.variance_buffer.add(copy.copy(self.pos))
         self.variance = self.variance_buffer.get_buffer_variance()
-        

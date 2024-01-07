@@ -37,12 +37,17 @@ class LinearTrajectory:
 
     def get_measurements(self):
         measurements = {}
+        realistic_outlier_injected = False
         for anchor_name, anchor in self.anchors.items():
             distance = ((self.position["x"] - anchor["x"])**2 +
                         (self.position["y"] - anchor["y"])**2 +
                         (self.position["z"] - anchor["z"])**2)**0.5
 
-            if const.OUTLIER_INJECTION_ENABLED and random.random() < const.OUTLIER_PROBABILITY:
+            if const.OUTLIER_INJECTION_REALISTIC_ENABLED and random.random() < const.OUTLIER_PROBABILITY and not realistic_outlier_injected:
+                outlier_distance = random.choice([random.uniform(0, const.OUTLIER_MIN), random.uniform(5, const.OUTLIER_MAX)]) 
+                distance = outlier_distance
+                realistic_outlier_injected = True
+            elif not const.OUTLIER_INJECTION_REALISTIC_ENABLED and random.random() < const.OUTLIER_PROBABILITY:
                 outlier_multiplier = random.uniform(1/const.OUTLIER_MULTIPLIER, const.OUTLIER_MULTIPLIER)
                 distance *= outlier_multiplier
             elif const.ADD_GAUSSIAN_NOISE:
