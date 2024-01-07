@@ -34,7 +34,7 @@ class DroneTracker:
             if id not in self.drones:
                 self._add_drone(id)
             self.drones[id].update_pos(measurements=Measurements(*[m for _, m in sorted(measurements.items(), key=lambda x: int(x[0]))], t=timestamp), ground_truth=ground_truth)
-            if self.history:
+            if self.history and self.drones[id].active:
                 self.drones_history[id].append(copy.copy(self.drones[id].pos))
         else:
             print(f'[Tracker] Drone {id} Invalid measurements len = {len(measurements)}, dropping packet')
