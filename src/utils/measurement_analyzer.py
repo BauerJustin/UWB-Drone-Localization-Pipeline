@@ -2,7 +2,7 @@ import numpy as np
 import json
 import pprint
 
-class DataAnalyzer:
+class MeasurementAnalyzer:
     def __init__(self, file_name):
         self.file_name = file_name
         self.measurements = self.load_data()

@@ -1,3 +1,5 @@
+import sys
+sys.path.append('.')
 import time
 from src.tracker import DroneTracker
 from src.utils import Parser, StreamCapture

@@ -1,9 +1,11 @@
-from src.utils import DataAnalyzer
+import sys
+sys.path.append('.')
+from src.utils import MeasurementAnalyzer
 from src.utils import Parser
 
 def main():
     args = Parser().parse()
-    analyzer = DataAnalyzer(args.file_name)
+    analyzer = MeasurementAnalyzer(args.file_name)
     analyzer.analyze()
 
 if __name__ == "__main__":
