@@ -15,7 +15,7 @@ class KalmanFilter:
         self.covariance = np.array(state.covariance)  # P
         self._update_transition_matrix(state, measurement)
         self._kf_predict()
-        self._kf_update(measurement.unpack())
+        self._kf_update(measurement)
         state.update(*self.state, self.covariance, measurement.t)
 
     def _update_transition_matrix(self, state, measurement):
@@ -30,11 +30,16 @@ class KalmanFilter:
         self.covariance = np.dot(np.dot(self.transition_matrix, self.covariance), self.transition_matrix.T) + self.process_noise
 
     def _kf_update(self, measurement):
-        # K = P(k) * H^T * (H * P(k) * H^T + R)^(-1)
-        kalman_gain = np.dot(np.dot(self.covariance, self.observation_matrix.T), 
-                             np.linalg.inv(np.dot(np.dot(self.observation_matrix, self.covariance), self.observation_matrix.T) + self.measurement_noise))
+        mask = np.array([value is not None for value in measurement.unpack()])
+        masked_observation_matrix = self.observation_matrix[mask, :]
 
-        # x(k) = x(k) + K * (Z - H * x(k))
-        self.state = self.state + np.dot(kalman_gain, (measurement - np.dot(self.observation_matrix, self.state)))
-        # P(k) = (I - K * H) * P(k)
-        self.covariance = np.dot((np.eye(len(self.observation_matrix[0])) - np.dot(kalman_gain, self.observation_matrix)), self.covariance)
+        if np.any(mask):
+            # K = P(k) * H^T * (H * P(k) * H^T + R)^(-1)
+            kalman_gain = np.dot(np.dot(self.covariance, self.observation_matrix.T), np.linalg.inv(
+                np.dot(np.dot(self.observation_matrix, self.covariance),self.observation_matrix.T) + self.measurement_noise))[:, mask]
+
+            # x(k) = x(k) + K * (Z - H * x(k))
+            self.state = self.state + np.dot(kalman_gain, (np.array(measurement.unpack())[mask] - np.dot(masked_observation_matrix, self.state)))
+
+            # P(k) = (I - K * H) * P(k)
+            self.covariance = np.dot(np.eye(len(self.state)) - np.dot(kalman_gain, masked_observation_matrix), self.covariance)

@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 from src.algorithms import Filter
 from src.algorithms.filters import MovingAverageFilter, KalmanFilter, ExtendedKalmanFilter
-from src.utils import Position
+from src.utils import Position, Measurements
 
 
 class TestFilter(unittest.TestCase):
@@ -85,7 +85,7 @@ class TestKalmanFilter(unittest.TestCase):
     def test_kf_update(self):
         initial_state = np.array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
         initial_covariance = np.eye(6)
-        measurement = np.array([7.0, 8.0, 9.0])
+        measurement = Position(7.0, 8.0, 9.0)
         observation_matrix = np.array([
             [1.0, 0.0, 0.0, 0.0, 0.0, 0.0],
             [0.0, 1.0, 0.0, 0.0, 0.0, 0.0],
@@ -106,10 +106,27 @@ class TestKalmanFilter(unittest.TestCase):
         # Make assertions about the updated state and covariance after update
         kalman_gain = np.dot(np.dot(initial_covariance, observation_matrix.T), 
                              np.linalg.inv(np.dot(np.dot(observation_matrix, initial_covariance), observation_matrix.T) + measurement_noise))
-        expected_state = initial_state + np.dot(kalman_gain, (measurement - np.dot(observation_matrix, initial_state)))
+        expected_state = initial_state + np.dot(kalman_gain, (measurement.unpack() - np.dot(observation_matrix, initial_state)))
         expected_covariance = np.dot((np.eye(6) - np.dot(kalman_gain, observation_matrix)), initial_covariance)
 
         self.assertTrue(np.allclose(self.kalman_filter.state, expected_state))
+        self.assertTrue(np.allclose(self.kalman_filter.covariance, expected_covariance))
+        
+    def test_kf_missing_measurements_update(self):
+        initial_state = np.array([1.0, 1.0, 1.0, 1.0, 0.5, 0.5, 0.5, 0.5])
+        initial_covariance = np.eye(8)
+
+        measurement = Measurements(d1=4.0, d2=None, d3=4.0, d4=4.0, t=1.0)
+
+        self.kalman_filter.state = initial_state
+        self.kalman_filter.covariance = initial_covariance
+
+        self.kalman_filter._kf_update(measurement)
+
+        expected_state = np.array([3.0, 1.0, 3.0, 3.0, 0.5, 0.5, 0.5, 0.5])
+        expected_covariance = np.diag([0.33333, 1, 0.33333, 0.33333, 1, 1, 1, 1])
+
+        self.assertTrue(np.allclose(list(self.kalman_filter.state), expected_state))
         self.assertTrue(np.allclose(self.kalman_filter.covariance, expected_covariance))
 
 class TestExtendedKalmanFilter(unittest.TestCase):
