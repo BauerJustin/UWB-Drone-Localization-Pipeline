@@ -49,10 +49,9 @@ class DroneSocket:
             try:
                 data, _ = self.tracker_socket.recvfrom(1024)
                 data = json.loads(data.decode('utf-8'))
-                # TODO: Update timestamp to be from tag
-                self.tracker.update_drone(id=data['id'], measurements=data['measurements'], timestamp=time.time(), ground_truth=data['ground_truth'] if 'ground_truth' in data else None)
+                self.tracker.update_drone(id=data['id'], measurements=data['measurements'], timestamp=data['timestamp'], ground_truth=data['ground_truth'] if 'ground_truth' in data else None)
                 if self.capture and not self.capture.replay:
-                    self.captured_stream.append((time.time(), data))
+                    self.captured_stream.append((data['timestamp'], data))
             except:
                 if self.shutdown_event.is_set():
                     break

@@ -25,7 +25,7 @@ class UWBNetworkSimulator:
         print("[Simulator] Terminated by user")
 
     def _run(self):
-        self._init_sockets()  # Initialize sockets here
+        self._init_sockets()
         while not self._stop_event.is_set():
             with self.lock:
                 self._get_and_send_measurements()
@@ -55,7 +55,8 @@ class UWBNetworkSimulator:
         msg = {
             'id': self.token,
             'measurements': measurements,
-            'ground_truth': ground_truth
+            'ground_truth': ground_truth,
+            'timestamp': time.time()
         }
         try:
             msg_json = json.dumps(msg)

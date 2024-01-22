@@ -15,7 +15,7 @@ def main():
         capture = StreamCapture(args.file_name, replay=args.replay)
 
     try:
-        tracker = DroneTracker(capture=capture)
+        tracker = DroneTracker(capture=capture, orchestrator=False)
         tracker.start()
 
         visualizer = Visualizer(tracker)

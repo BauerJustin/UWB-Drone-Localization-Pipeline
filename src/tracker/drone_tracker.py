@@ -1,12 +1,16 @@
 import copy
 from .drone_socket import DroneSocket
+from .drone_orchestrator import DroneOrchestrator
 from src.devices import AnchorNetwork, Drone
 from src.utils import load_config, Measurements
 
 
 class DroneTracker:
-    def __init__(self, capture=None):
-        self.socket = DroneSocket(tracker=self, capture=capture)
+    def __init__(self, capture=None, orchestrator=False):
+        if orchestrator:
+            self.socket = DroneOrchestrator(tracker=self)
+        else:
+            self.socket = DroneSocket(tracker=self, capture=capture)
         self.drones = {}
 
         self.anchor_network = AnchorNetwork()
