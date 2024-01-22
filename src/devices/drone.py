@@ -4,7 +4,7 @@ import time
 from src.algorithms import Multilateration, Filter, Buffer, OutlierRejection
 from src.utils import Position
 from src import constants as const
-
+from src.utils import load_config 
 
 class Drone:
     def __init__(self, id, anchor_network):
@@ -30,6 +30,8 @@ class Drone:
 
         self.active = False
 
+        self.logger = load_config.setup_logger(__name__)
+
     def update_pos(self, measurements, ground_truth):
         if const.BASE == 'pos':
             self._update_pos_base(measurements)
@@ -43,6 +45,7 @@ class Drone:
             self.ground_truth = Position(**ground_truth)
 
     def _update_measurement_base(self, measurements):
+        self.logger.info(f'\n***DRONE {self.id}***')
         if const.OUTLIER_REJECTION_ENABLED:
             measurements = self.outler_rejection.filter_outlier(copy.copy(measurements), self.active, self.measurement_variance_buffer.buffer)
             if measurements is None:
@@ -55,9 +58,13 @@ class Drone:
 
         self.pos = self.multilaterator.calculate_position(self.measurements, last_pos=self.pos if self.active else None)
 
+        self.logger.info(f'*New Measurement: {self.measurements.unpack()}')
+        self.logger.info(f'*New Pos: {self.pos.unpack()}')
+
         self._update_stats()
 
     def _update_pos_base(self, measurements):
+        self.logger.info(f'\n***DRONE {self.id}***')
         self.measurements = measurements
         new_pos = self.multilaterator.calculate_position(self.measurements, last_pos=self.pos if self.active else None)
 
@@ -70,6 +77,9 @@ class Drone:
             self.pos = new_pos
         else:
             self.filter.update(self.pos, new_pos)
+
+        self.logger.info(f'*New Measurement: {self.measurements.unpack()}')
+        self.logger.info(f'*New Pos: {self.pos.unpack()}')
 
         self._update_stats()
 

@@ -1,10 +1,12 @@
 import numpy as np
 from src import constants as const
+from src.utils import load_config
 
 class OutlierRejection:
     def __init__(self, outlier_replacement="V3"):
         self.outlier_replacement = outlier_replacement
         self.is_active = False
+        self.logger = load_config.setup_logger(__name__)
 
     def _replace_outlier(self, plotted_values, outlier_measurements):
             plotted_values.append(outlier_measurements)
@@ -37,9 +39,11 @@ class OutlierRejection:
         self.is_active = active
         new_val = np.array(incoming_value.unpack())
         if any(val < const.REJECT_OUTLIER_MIN or val > const.REJECT_OUTLIER_MAX for val in new_val):
+            self.logger.info(f'\t Outlier: {new_val}')
             if self.is_active:
                 if self.outlier_replacement == "V1":
                     replaced_value = self._replace_outlier(plotted_values, incoming_value)
+                    self.logger.info(f'\t Replaced val V1: {replaced_value.unpack()}')
                     return replaced_value
                 elif self.outlier_replacement == "V2":
                     new_val_list = new_val.tolist()
@@ -48,6 +52,5 @@ class OutlierRejection:
                     return incoming_value
             else:
                 return None
-
         else:
             return incoming_value
