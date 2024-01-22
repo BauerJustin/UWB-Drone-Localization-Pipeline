@@ -53,6 +53,14 @@ Run the UWB drone control pipeline with the following command:
 python3 drone_control.py
 ```
 
+### Scripts
+
+To execute any scripts located in the `scripts` folder, run this command from the root directory of the project:
+
+```bash
+python3 scripts/*.py [--args]
+```
+
 ## Tests
 
 To run all unit tests use the following command:

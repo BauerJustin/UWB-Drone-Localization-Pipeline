@@ -1,20 +1,22 @@
 # Drone Tracker
-BASE = "pos"  # pos, measurement
+BASE = "measurement"  # pos, measurement
 
 FIRST_UPDATES_SKIPPED = 5
 
 FILTER_ENABLED = True
 FILTER_TYPE = "KF"  # MA (Moving Average), KF (Kalman Filter), EKF (Extended Kalman Filter)
 
-BUFFER_ENABLED = True
-BUFFER_MODE = 'last'  # avg, last
-BUFFER_SIZE = 20
-BUFFER_FILTER_OUTLIERS = True
+BUFFER_ENABLED = False
+
+REJECT_OUTLIER_MIN = 0
+REJECT_OUTLIER_MAX = 5
+OUTLIER_REJECTION_ENABLED = True
+OUTLIER_REPLACEMENT_ENABLED = "V1" # "V1" (historical quad interp), "V2" (KF)
 
 MEASURE_VARIANCE = True
-VARIANCE_SIZE = 5
+VARIANCE_SIZE = 20
 
-# Multilateration settins
+# Multilateration settings
 USE_LAST_POS = True
 
 # MA settings
@@ -29,8 +31,9 @@ GAUSSIAN_NOISE_MEAN = 0.0
 GAUSSIAN_NOISE_STD = 0.1
 
 OUTLIER_INJECTION_ENABLED = True
-OUTLIER_PROBABILITY = 0.01
-OUTLIER_MULTIPLIER = 1.5
+OUTLIER_MIN = -327
+OUTLIER_MAX = 327
+OUTLIER_PROBABILITY = 0.30
 
 # Visualizer
 PLOT_GROUND_TRUTH = True
