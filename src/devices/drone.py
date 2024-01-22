@@ -2,9 +2,9 @@ import copy
 import math
 import time
 from src.algorithms import Multilateration, Filter, Buffer, OutlierRejection
-from src.utils import Position
+from src.utils import Position, load_config
 from src import constants as const
-from src.utils import load_config 
+
 
 class Drone:
     def __init__(self, id, anchor_network):
@@ -50,16 +50,13 @@ class Drone:
             measurements = self.outler_rejection.filter_outlier(copy.copy(measurements), self.active, self.measurement_variance_buffer.buffer)
             if measurements is None:
                 return
-                        
+
         if not const.FILTER_ENABLED or not self.active:
             self.measurements = measurements
         else:
             self.filter.update(self.measurements, measurements)
 
         self.pos = self.multilaterator.calculate_position(self.measurements, last_pos=self.pos if self.active else None)
-
-        self.logger.info(f'*New Measurement: {self.measurements.unpack()}')
-        self.logger.info(f'*New Pos: {self.pos.unpack()}')
 
         self._update_stats()
 
@@ -78,9 +75,6 @@ class Drone:
         else:
             self.filter.update(self.pos, new_pos)
 
-        self.logger.info(f'*New Measurement: {self.measurements.unpack()}')
-        self.logger.info(f'*New Pos: {self.pos.unpack()}')
-
         self._update_stats()
 
     def get_pos(self):
@@ -97,8 +91,10 @@ class Drone:
     
     def get_euclid_dist(self):
         return math.sqrt((self.pos.x - self.ground_truth.x)**2 + (self.pos.y - self.ground_truth.y)**2 + (self.pos.z - self.ground_truth.z)**2)
-        
+    
     def _update_stats(self):
+        self.logger.info(f'*New Measurement: {self.measurements.unpack()}')
+        self.logger.info(f'*New Pos: {self.pos.unpack()}')
         self._update_variance()
         self._update_frequency()
         self.active = self.update_count > const.FIRST_UPDATES_SKIPPED
@@ -115,4 +111,4 @@ class Drone:
     def _update_variance(self):
         self.pos_variance_buffer.add(copy.copy(self.pos))
         self.measurement_variance_buffer.add(copy.copy(self.measurements))
-        self.variance = self.pos_variance_buffer.get_buffer_variance()
+        self.variance = self.pos_variance_buffer.get_variance()

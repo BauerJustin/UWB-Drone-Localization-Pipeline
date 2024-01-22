@@ -52,7 +52,7 @@ class MeasurementAnalyzer:
 
     def extract_outliers(self):
         for distances in self.measurements:
-            if any(value < 0 or value > 5 for value in distances):
+            if any(value < const.NON_OUTLIER_MIN or value > const.NON_OUTLIER_MAX for value in distances):
                 self.data_with_outliers.append(distances)
             else:
                 self.data_without_outliers.append(distances)
@@ -77,7 +77,7 @@ class MeasurementAnalyzer:
         for i in range(len(self.measurements)):
             for dist_idx, dist in enumerate(self.measurements[i]):
                 temp = {'index': [], 'count': 0, 'anchor_id': set()}
-                if dist < const.REJECT_OUTLIER_MIN or dist > const.REJECT_OUTLIER_MAX:
+                if dist < const.NON_OUTLIER_MIN or dist > const.NON_OUTLIER_MAX:
                     self.outlier_data_info.setdefault(dist, temp)
                     self.outlier_data_info[dist]['count'] += 1
                     self.outlier_data_info[dist]['index'].append(i)

@@ -31,8 +31,9 @@ class Buffer:
         else:
             raise Exception(f"Invalid buffer base: {self.base_type}")
 
-    def get_buffer_variance(self):
+    def get_variance(self):
         values = np.array([p.unpack() for p in self.buffer])
         median = np.median(values, axis=0)
         deviation = np.median(np.abs(values - median), axis=0)
         return deviation
+    
