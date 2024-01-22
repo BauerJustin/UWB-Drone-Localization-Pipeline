@@ -1,7 +1,7 @@
 import copy
 import math
 import time
-from src.algorithms import Multilateration, Filter, Buffer
+from src.algorithms import Multilateration, Filter, Buffer, OutlierRejection
 from src.utils import Position
 from src import constants as const
 
@@ -14,11 +14,11 @@ class Drone:
         self.multilaterator = Multilateration(anchor_network=self.anchor_network)
         if const.FILTER_ENABLED:
             self.filter = Filter(filter_type=const.FILTER_TYPE)
-        if const.BUFFER_ENABLED:
-            self.buffer = Buffer(base_type=const.BASE, size=const.BUFFER_SIZE, filter_outliers=const.BUFFER_FILTER_OUTLIERS,
-                                            outlier_rejection_version=const.OUTLIER_REJECTION_VERSION, outlier_replacement=const.OUTLIER_REPLACEMENT_ENABLED)
         if const.MEASURE_VARIANCE:
-            self.variance_buffer = Buffer(base_type="pos", size=const.VARIANCE_SIZE)
+            self.pos_variance_buffer = Buffer(base_type="pos", size=const.VARIANCE_SIZE)
+            self.measurement_variance_buffer = Buffer(base_type="measurement", size=const.VARIANCE_SIZE)
+        if const.OUTLIER_REJECTION_ENABLED:
+            self.outler_rejection = OutlierRejection(const.OUTLIER_REPLACEMENT_ENABLED)
 
         self.has_ground_truth, self.ground_truth = None, None
 
@@ -43,25 +43,26 @@ class Drone:
             self.ground_truth = Position(**ground_truth)
 
     def _update_measurement_base(self, measurements):
-        if const.BUFFER_ENABLED:
-            measurements = self._update_buffer(measurements)
+        if const.OUTLIER_REJECTION_ENABLED:
+            measurements = self.outler_rejection.filter_outlier(copy.copy(measurements), self.active, self.measurement_variance_buffer.buffer)
             if measurements is None:
                 return
-            
+                        
         if not const.FILTER_ENABLED or not self.active:
             self.measurements = measurements
         else:
             self.filter.update(self.measurements, measurements)
-        
+
         self.pos = self.multilaterator.calculate_position(self.measurements, last_pos=self.pos if self.active else None)
 
         self._update_stats()
 
     def _update_pos_base(self, measurements):
-        new_pos = self.multilaterator.calculate_position(measurements, last_pos=self.pos if self.active else None)
+        self.measurements = measurements
+        new_pos = self.multilaterator.calculate_position(self.measurements, last_pos=self.pos if self.active else None)
 
-        if const.BUFFER_ENABLED:
-            new_pos = self._update_buffer(new_pos)
+        if const.OUTLIER_REJECTION_ENABLED:
+            new_pos = self.outler_rejection.filter_outlier(copy.copy(new_pos), self.active, self.pos_variance_buffer.buffer)
             if new_pos is None:
                 return
 
@@ -86,17 +87,7 @@ class Drone:
     
     def get_euclid_dist(self):
         return math.sqrt((self.pos.x - self.ground_truth.x)**2 + (self.pos.y - self.ground_truth.y)**2 + (self.pos.z - self.ground_truth.z)**2)
-    
-    def _update_buffer(self, value):
-        self.buffer.add(value)
-        if const.BUFFER_MODE == 'avg':
-            new_value = self.buffer.get_avg()
-        elif const.BUFFER_MODE == 'last':
-            new_value = self.buffer.get_last()
-        else:
-            raise Exception(f"Invalid buffer mode: {const.BUFFER_MODE}")
-        return new_value
-    
+        
     def _update_stats(self):
         self._update_variance()
         self._update_frequency()
@@ -112,5 +103,6 @@ class Drone:
         self.update_count += 1
 
     def _update_variance(self):
-        self.variance_buffer.add(copy.copy(self.pos))
-        self.variance = self.variance_buffer.get_buffer_variance()
+        self.pos_variance_buffer.add(copy.copy(self.pos))
+        self.measurement_variance_buffer.add(copy.copy(self.measurements))
+        self.variance = self.pos_variance_buffer.get_buffer_variance()

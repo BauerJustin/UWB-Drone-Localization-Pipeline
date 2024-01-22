@@ -1,13 +1,18 @@
+from src.utils import StreamCapture, load_config
 import numpy as np
-import json
 import pprint
+from src import constants as const
 
 class MeasurementAnalyzer:
     def __init__(self, file_name):
         self.file_name = file_name
+        self.capture = StreamCapture(self.file_name, replay=False, live=False)
         self.measurements = self.load_data()
         self.total_data = len(self.measurements)
 
+        self.anchors = load_config.load_anchor_positions()
+        self.anchor_ids = sorted(self.anchors.keys())
+        
         self.outlier_data_info = {}
         self.incomplete_data_info = {}
         
@@ -21,17 +26,9 @@ class MeasurementAnalyzer:
         self.total_outliers = 0
         self.total_incomplete_data = 0
 
-
     def load_data(self):
-        try:
-            with open(f'./captures/{self.file_name}', 'r') as file:
-                data = json.load(file)
-        except FileNotFoundError:
-            print("File not found. Please check the file path.")
-            return []
-        except json.JSONDecodeError as e:
-            raise Exception(f"Error decoding JSON: {e}")
-        
+        data = self.capture.read_stream()
+
         anchor_distances = []
         for _, packet in data:
             distances = packet["measurements"]
@@ -77,26 +74,24 @@ class MeasurementAnalyzer:
         return np.array(self.data_complete_without_outliers)
 
     def extract_outlier_data_info(self):
-        anchor_ids = ['81', '82', '83', '84']
         for i in range(len(self.measurements)):
             for dist_idx, dist in enumerate(self.measurements[i]):
                 temp = {'index': [], 'count': 0, 'anchor_id': set()}
-                if dist < 0 or dist > 5:
+                if dist < const.REJECT_OUTLIER_MIN or dist > const.REJECT_OUTLIER_MAX:
                     self.outlier_data_info.setdefault(dist, temp)
                     self.outlier_data_info[dist]['count'] += 1
                     self.outlier_data_info[dist]['index'].append(i)
-                    self.outlier_data_info[dist]['anchor_id'].add(anchor_ids[dist_idx])
+                    self.outlier_data_info[dist]['anchor_id'].add(self.anchor_ids[dist_idx])
                     self.total_outliers += 1
 
     def extract_incomplete_data_info(self):
-        anchor_ids = ['81', '82', '83', '84']
         for i in range(len(self.measurements)):
             for dist_idx, dist in enumerate(self.measurements[i]):
                 if dist == 0:
                     temp = {'anchor_id': [], 'incomplete_measurement': 0}
                     temp_str = f'measurement_idx_{i}'
                     self.incomplete_data_info.setdefault(temp_str, temp)
-                    self.incomplete_data_info[temp_str]['anchor_id'].append(anchor_ids[dist_idx])
+                    self.incomplete_data_info[temp_str]['anchor_id'].append(self.anchor_ids[dist_idx])
                     self.incomplete_data_info[temp_str]['incomplete_measurement'] = self.measurements[i]
                     self.total_incomplete_data += 1
                     break
