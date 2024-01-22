@@ -18,7 +18,7 @@ class Drone:
             self.pos_variance_buffer = Buffer(base_type="pos", size=const.VARIANCE_SIZE)
             self.measurement_variance_buffer = Buffer(base_type="measurement", size=const.VARIANCE_SIZE)
         if const.OUTLIER_REJECTION_ENABLED:
-            self.outler_rejection = OutlierRejection(const.OUTLIER_REPLACEMENT_ENABLED)
+            self.outler_rejection = OutlierRejection(const.OUTLIER_INTERPOLATION_ENABLED)
 
         self.has_ground_truth, self.ground_truth = None, None
 
@@ -46,8 +46,8 @@ class Drone:
 
     def _update_measurement_base(self, measurements):
         self.logger.info(f'\n***DRONE {self.id}***')
-        if const.OUTLIER_REJECTION_ENABLED:
-            measurements = self.outler_rejection.filter_outlier(copy.copy(measurements), self.active, self.measurement_variance_buffer.buffer)
+        if const.OUTLIER_REJECTION_ENABLED and self.active:
+            measurements = self.outler_rejection.filter_outlier(copy.copy(measurements), self.measurement_variance_buffer.buffer)
             if measurements is None:
                 return
 
@@ -65,8 +65,8 @@ class Drone:
         self.measurements = measurements
         new_pos = self.multilaterator.calculate_position(self.measurements, last_pos=self.pos if self.active else None)
 
-        if const.OUTLIER_REJECTION_ENABLED:
-            new_pos = self.outler_rejection.filter_outlier(copy.copy(new_pos), self.active, self.pos_variance_buffer.buffer)
+        if const.OUTLIER_REJECTION_ENABLED and self.active:
+            new_pos = self.outler_rejection.filter_outlier(copy.copy(new_pos), self.pos_variance_buffer.buffer)
             if new_pos is None:
                 return
 
