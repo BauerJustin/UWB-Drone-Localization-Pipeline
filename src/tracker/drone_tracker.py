@@ -3,10 +3,11 @@ from .drone_socket import DroneSocket
 from .drone_orchestrator import DroneOrchestrator
 from src.devices import AnchorNetwork, Drone
 from src.utils import load_config, Measurements
+from src import constants as const
 
 
 class DroneTracker:
-    def __init__(self, capture=None, orchestrator=False):
+    def __init__(self, capture=None, orchestrator=const.ORCHESTRATOR):
         if orchestrator:
             self.socket = DroneOrchestrator(tracker=self)
         else:
