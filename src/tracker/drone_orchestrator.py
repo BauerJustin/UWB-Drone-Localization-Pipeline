@@ -43,7 +43,13 @@ class DroneOrchestrator:
             tag_socket.close()
             return
         
-        id = json.loads(data.decode('utf-8'))['id']
+        data = json.loads(data.decode('utf-8'))
+        id = data['id']
+        if 'measurements' in data:
+            self.tracker.update_drone(id=data['id'],
+                                      measurements=data['measurements'],
+                                      timestamp=data['timestamp'],
+                                      ground_truth=data.get('ground_truth'))
         tag_socket.settimeout(const.ORCHESTRATOR_TIMEOUT)
 
         while True:
