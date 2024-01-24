@@ -15,8 +15,7 @@ class Drone:
         if const.FILTER_ENABLED:
             self.filter = Filter(filter_type=const.FILTER_TYPE)
         if const.MEASURE_VARIANCE:
-            self.pos_variance_buffer = Buffer(base_type="pos", size=const.VARIANCE_SIZE)
-            self.measurement_variance_buffer = Buffer(base_type="measurement", size=const.VARIANCE_SIZE)
+            self.variance_buffer = Buffer(base_type="pos", size=const.VARIANCE_SIZE)
         if const.OUTLIER_REJECTION_ENABLED:
             self.outler_rejection = OutlierRejection(const.OUTLIER_INTERPOLATION_ENABLED)
 
@@ -33,21 +32,23 @@ class Drone:
         self.logger = load_config.setup_logger(__name__)
 
     def update_pos(self, measurements, ground_truth):
+        self.logger.info(f'\n***DRONE {self.id}***')
         if const.BASE == 'pos':
             self._update_pos_base(measurements)
         elif const.BASE == 'measurement':
             self._update_measurement_base(measurements)
         else:
             raise Exception(f"Invalid base: {const.BASE}")
+        self.logger.info(f'*New Measurement: {self.measurements.unpack()}')
+        self.logger.info(f'*New Pos: {self.pos.unpack()}')
 
         if ground_truth:
             self.has_ground_truth = True
             self.ground_truth = Position(**ground_truth)
 
     def _update_measurement_base(self, measurements):
-        self.logger.info(f'\n***DRONE {self.id}***')
         if const.OUTLIER_REJECTION_ENABLED and self.active:
-            measurements = self.outler_rejection.filter_outlier(copy.copy(measurements), self.measurement_variance_buffer.buffer)
+            measurements = self.outler_rejection.filter_outlier(measurements)
             if measurements is None:
                 return
 
@@ -56,17 +57,19 @@ class Drone:
         else:
             self.filter.update(self.measurements, measurements)
 
+        if const.OUTLIER_INJECTION_ENABLED:
+            self.outler_rejection.add_to_buffer(self.measurements)
+
         self.pos = self.multilaterator.calculate_position(self.measurements, last_pos=self.pos if self.active else None)
 
         self._update_stats()
 
     def _update_pos_base(self, measurements):
-        self.logger.info(f'\n***DRONE {self.id}***')
         self.measurements = measurements
         new_pos = self.multilaterator.calculate_position(self.measurements, last_pos=self.pos if self.active else None)
 
         if const.OUTLIER_REJECTION_ENABLED and self.active:
-            new_pos = self.outler_rejection.filter_outlier(copy.copy(new_pos), self.pos_variance_buffer.buffer)
+            new_pos = self.outler_rejection.filter_outlier(new_pos)
             if new_pos is None:
                 return
 
@@ -74,6 +77,9 @@ class Drone:
             self.pos = new_pos
         else:
             self.filter.update(self.pos, new_pos)
+
+        if const.OUTLIER_INJECTION_ENABLED:
+            self.outler_rejection.add_to_buffer(self.measurements)
 
         self._update_stats()
 
@@ -93,8 +99,6 @@ class Drone:
         return math.sqrt((self.pos.x - self.ground_truth.x)**2 + (self.pos.y - self.ground_truth.y)**2 + (self.pos.z - self.ground_truth.z)**2)
     
     def _update_stats(self):
-        self.logger.info(f'*New Measurement: {self.measurements.unpack()}')
-        self.logger.info(f'*New Pos: {self.pos.unpack()}')
         self._update_variance()
         self._update_frequency()
         self.active = self.update_count > const.FIRST_UPDATES_SKIPPED
@@ -109,6 +113,5 @@ class Drone:
         self.update_count += 1
 
     def _update_variance(self):
-        self.pos_variance_buffer.add(copy.copy(self.pos))
-        self.measurement_variance_buffer.add(copy.copy(self.measurements))
-        self.variance = self.pos_variance_buffer.get_variance()
+        self.variance_buffer.add(copy.copy(self.pos))
+        self.variance = self.variance_buffer.get_variance()

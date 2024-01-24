@@ -8,7 +8,8 @@ FILTER_TYPE = "KF"  # MA (Moving Average), KF (Kalman Filter), EKF (Extended Kal
 
 NON_OUTLIER_MIN, NON_OUTLIER_MAX = 0, 5
 OUTLIER_REJECTION_ENABLED = True
-OUTLIER_INTERPOLATION_ENABLED = True  # True: Quad interpolation, False: Rely on Filter
+OUTLIER_INTERPOLATION_ENABLED = False  # True: Quad interpolation, False: Rely on Filter
+OUTLIER_INTERPOLATION_BUFFER_SIZE = 20
 
 MEASURE_VARIANCE = True
 VARIANCE_SIZE = 5

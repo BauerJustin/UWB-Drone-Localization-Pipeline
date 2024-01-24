@@ -1,17 +1,19 @@
 import numpy as np
 from src import constants as const
+from src.algorithms import Buffer
 from src.utils import load_config
 
 class OutlierRejection:
     def __init__(self, outlier_replacement=False):
         self.outlier_replacement = outlier_replacement
+        self.buffer = Buffer(base_type=const.BASE, size=const.OUTLIER_INTERPOLATION_BUFFER_SIZE)
         self.logger = load_config.setup_logger(__name__)
 
-    def filter_outlier(self, value, buffer):
+    def filter_outlier(self, value):
         if any(val < const.NON_OUTLIER_MIN or val > const.NON_OUTLIER_MAX for val in value.unpack()):
             self.logger.info(f'\t Outlier: {value.unpack()}')
             if self.outlier_replacement:
-                value = self._replace_outlier(value, buffer)
+                value = self._replace_outlier(value)
                 self.logger.info(f'\t Replaced value: {value.unpack()}')
             else:
                 filtered_value = [
@@ -20,10 +22,13 @@ class OutlierRejection:
                 ]
                 value.update(*filtered_value)
         return value
+    
+    def add_to_buffer(self, value):
+        if self.outlier_replacement:
+            self.buffer.add(value)
 
-    def _replace_outlier(self, value, buffer):
-        buffer.append(value)
-        data = np.array([val.unpack() for val in buffer])
+    def _replace_outlier(self, value):
+        data = np.array([val.unpack() for val in self.buffer.buffer])
         data = np.where(
             (data < const.NON_OUTLIER_MIN) | (data > const.NON_OUTLIER_MAX),
             np.nan,
