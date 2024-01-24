@@ -46,10 +46,7 @@ class DroneOrchestrator:
         data = json.loads(data.decode('utf-8'))
         id = data['id']
         if 'measurements' in data:
-            self.tracker.update_drone(id=data['id'],
-                                      measurements=data['measurements'],
-                                      timestamp=data['timestamp'],
-                                      ground_truth=data.get('ground_truth'))
+            self.tracker.update_drone(data)
         tag_socket.settimeout(const.ORCHESTRATOR_TIMEOUT)
 
         while True:
@@ -65,10 +62,7 @@ class DroneOrchestrator:
                     break  # Connection closed by the client
                 data = json.loads(data.decode('utf-8'))
 
-            self.tracker.update_drone(id=data['id'],
-                                      measurements=data['measurements'],
-                                      timestamp=data['timestamp'],
-                                      ground_truth=data.get('ground_truth'))
+            self.tracker.update_drone(data)
 
             time.sleep(const.ORCHESTRATOR_COOLDOWN)
 
