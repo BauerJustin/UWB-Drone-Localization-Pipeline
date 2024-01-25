@@ -79,7 +79,7 @@ class Drone:
             self.filter.update(self.pos, new_pos)
 
         if const.OUTLIER_INTERPOLATION_ENABLED:
-            self.outler_rejection.add_to_buffer(self.measurements)
+            self.outler_rejection.add_to_buffer(self.pos)
 
         self._update_stats()
 
