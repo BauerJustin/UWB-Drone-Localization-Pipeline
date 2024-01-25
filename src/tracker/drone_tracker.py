@@ -64,7 +64,7 @@ class DroneTracker:
                 self._add_drone(id)
             self.drones[id].update_pos(measurements=Measurements(*[m for _, m in sorted(measurements.items(), key=lambda x: int(x[0]))], t=timestamp), ground_truth=ground_truth)
             if self.capture and not self.capture.replay:
-                self.captured_stream.append((timestamp, data))
+                self.captured_stream.append((time.time(), data))
             if self.history and self.drones[id].active:
                 self.drones_history[id].append(copy.copy(self.drones[id].pos))
         else:
@@ -83,12 +83,12 @@ class DroneTracker:
             self._save_capture()
 
     def _replay_capture(self):
-        self.stream = sorted(self.stream, key=lambda x: x[0])
         for i in range(len(self.stream)):
             if self.shutdown_event.is_set():
                 break
             curr_time, data = self.stream[i]
-            data['timestamp'] = curr_time  # TODO: Temp fix
+            if 'timestamp' not in data:
+                data['timestamp'] = curr_time
             self.update_drone(data)
             if self.capture.live and i+1 < len(self.stream):
                 next_time, _ = self.stream[i+1]
