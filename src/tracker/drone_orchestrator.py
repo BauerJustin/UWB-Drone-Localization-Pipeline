@@ -16,6 +16,7 @@ class DroneOrchestrator:
         self.lock = threading.Lock()
 
     def start(self):
+        self.tracker_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.tracker_socket.bind((self.host, self.port))
         self.tracker_socket.listen()
 

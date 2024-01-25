@@ -14,6 +14,7 @@ class DroneSocket:
         self.shutdown_event = threading.Event()
 
     def start(self):
+        self.tracker_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.tracker_socket.bind((self.host, self.port))
 
         print(f"[Socket] Listening on {self.host}:{self.port}")
