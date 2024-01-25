@@ -1,3 +1,4 @@
+import copy
 import numpy as np
 from src import constants as const
 from src.algorithms import Buffer
@@ -25,10 +26,11 @@ class OutlierRejection:
     
     def add_to_buffer(self, value):
         if self.outlier_replacement:
-            self.buffer.add(value)
+            self.buffer.add(copy.copy(value))
 
     def _replace_outlier(self, value):
         data = np.array([val.unpack() for val in self.buffer.buffer])
+        data = np.vstack((data, value.unpack()))
         data = np.where(
             (data < const.NON_OUTLIER_MIN) | (data > const.NON_OUTLIER_MAX),
             np.nan,
