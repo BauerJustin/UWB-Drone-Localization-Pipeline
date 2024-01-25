@@ -64,7 +64,5 @@ class DroneOrchestrator:
 
             self.tracker.update_drone(data)
 
-            time.sleep(const.ORCHESTRATOR_COOLDOWN)
-
         tag_socket.close()
         print(f"[Orchestrator] {id} connection at {tag_address} closed")
