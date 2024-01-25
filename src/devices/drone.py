@@ -57,7 +57,7 @@ class Drone:
         else:
             self.filter.update(self.measurements, measurements)
 
-        if const.OUTLIER_INJECTION_ENABLED:
+        if const.OUTLIER_INTERPOLATION_ENABLED:
             self.outler_rejection.add_to_buffer(self.measurements)
 
         self.pos = self.multilaterator.calculate_position(self.measurements, last_pos=self.pos if self.active else None)
@@ -78,7 +78,7 @@ class Drone:
         else:
             self.filter.update(self.pos, new_pos)
 
-        if const.OUTLIER_INJECTION_ENABLED:
+        if const.OUTLIER_INTERPOLATION_ENABLED:
             self.outler_rejection.add_to_buffer(self.measurements)
 
         self._update_stats()
