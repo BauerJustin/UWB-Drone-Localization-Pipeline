@@ -45,7 +45,7 @@ class Drone:
             self.filter.update(self.measurements, measurements)
         self.logger.info(f'*New Measurement: {self.measurements.unpack()}')
 
-        if const.OUTLIER_INTERPOLATION_ENABLED:
+        if const.OUTLIER_INTERPOLATION_ENABLED and self.active:
             self.outler_rejection.add_to_buffer(self.measurements)
 
         if self.active:

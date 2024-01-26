@@ -13,7 +13,7 @@ class OutlierRejection:
     def filter_outlier(self, value):
         if any(val and (val < const.NON_OUTLIER_MIN or val > const.NON_OUTLIER_MAX) for val in value.unpack()):
             self.logger.info(f'\t Outlier: {value.unpack()}')
-            if self.outlier_replacement:
+            if self.outlier_replacement and len(self.buffer) >= const.OUTLIER_INTERPOLATION_MIN_BUFFER:
                 value = self._replace_outlier(value)
                 self.logger.info(f'\t Replaced value: {value.unpack()}')
             else:
