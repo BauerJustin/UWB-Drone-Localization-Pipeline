@@ -12,8 +12,7 @@ class Drone:
         self.anchor_network = anchor_network
 
         self.multilaterator = Multilateration(anchor_network=self.anchor_network)
-        if const.FILTER_ENABLED:
-            self.filter = Filter(filter_type=const.FILTER_TYPE)
+        self.filter = Filter(filter_type=const.FILTER_TYPE)
         if const.MEASURE_VARIANCE:
             self.variance_buffer = Buffer(base_type="pos", size=const.VARIANCE_SIZE)
         if const.OUTLIER_REJECTION_ENABLED:
@@ -38,7 +37,7 @@ class Drone:
             if measurements is None:
                 return
 
-        if not const.FILTER_ENABLED or not self.active:
+        if not self.active:
             self.measurements = measurements
             if None not in self.measurements.unpack():
                 self.active = True

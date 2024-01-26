@@ -36,7 +36,7 @@ class KalmanFilter:
         if np.any(mask):
             # K = P(k) * H^T * (H * P(k) * H^T + R)^(-1)
             kalman_gain = np.dot(np.dot(self.covariance, self.observation_matrix.T), np.linalg.inv(
-                np.dot(np.dot(self.observation_matrix, self.covariance),self.observation_matrix.T) + self.measurement_noise))[:, mask]
+                np.dot(np.dot(self.observation_matrix, self.covariance), self.observation_matrix.T) + self.measurement_noise))[:, mask]
 
             # x(k) = x(k) + K * (Z - H * x(k))
             self.state = self.state + np.dot(kalman_gain, (np.array(measurement.unpack())[mask] - np.dot(masked_observation_matrix, self.state)))

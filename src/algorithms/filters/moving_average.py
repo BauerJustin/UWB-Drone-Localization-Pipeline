@@ -6,6 +6,6 @@ class MovingAverageFilter:
 
     def update(self, state, measurement):
         state.update(*[
-            s * (1 - self.filter_rate) + m * self.filter_rate
+            s * (1 - self.filter_rate) + m * self.filter_rate if m else s
             for s, m in zip(state.unpack(), measurement.unpack())
         ])

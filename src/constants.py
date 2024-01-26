@@ -1,8 +1,7 @@
 # Drone Tracker
 DROP_PARTIAL_MEASUREMENTS = False
 
-FILTER_ENABLED = True
-FILTER_TYPE = "KF"  # MA (Moving Average), KF (Kalman Filter), EKF (Extended Kalman Filter)
+FILTER_TYPE = "KF"  # MA (Moving Average), KF (Kalman Filter) - to disable set MA with 1.0
 
 NON_OUTLIER_MIN, NON_OUTLIER_MAX = 0, 5
 OUTLIER_REJECTION_ENABLED = True
