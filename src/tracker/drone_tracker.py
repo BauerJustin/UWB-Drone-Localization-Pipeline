@@ -21,7 +21,7 @@ class DroneTracker:
         for anchor_id, pos in anchors.items():
             self.anchor_network.add_anchor(anchor_id, **pos)
 
-        self.dropped_count = 0
+        self.dropped_measurements = 0
 
         self.capture = capture
         self.history = False
@@ -59,17 +59,18 @@ class DroneTracker:
 
     def update_drone(self, data):
         id, measurements, timestamp, ground_truth = data['id'], data['measurements'], data['timestamp'], data.get('ground_truth')
-        if len(data['measurements']) == 4:
-            if id not in self.drones:
-                self._add_drone(id)
-            self.drones[id].update_pos(measurements=Measurements(*[m for _, m in sorted(measurements.items(), key=lambda x: int(x[0]))], t=timestamp), ground_truth=ground_truth)
-            if self.capture and not self.capture.replay:
-                self.captured_stream.append((time.time(), data))
-            if self.history and self.drones[id].active:
-                self.drones_history[id].append(copy.copy(self.drones[id].pos))
-        else:
-            print(f'[Tracker] Drone {id} Invalid measurements len = {len(measurements)}, dropping packet')
-            self.dropped_count += 1
+        if id not in self.drones:
+            self._add_drone(id)
+        if len(measurements) != 4:
+            self.dropped_measurements += 4 - len(measurements)
+            if const.DROP_PARTIAL_MEASUREMENTS:
+                print(f'[Tracker] Drone {id} Invalid measurements len = {len(measurements)}, dropping packet')
+                return
+        self.drones[id].update_pos(measurements=Measurements(*[measurements[anchor_id] if anchor_id in measurements else None for anchor_id in self.anchor_network.get_anchor_ids()], t=timestamp), ground_truth=ground_truth)
+        if self.capture and not self.capture.replay:
+            self.captured_stream.append((time.time(), data))
+        if self.history and self.drones[id].active:
+            self.drones_history[id].append(copy.copy(self.drones[id].pos))
 
     def _add_drone(self, id):
         self.drones[id] = Drone(id=id, anchor_network=self.anchor_network)

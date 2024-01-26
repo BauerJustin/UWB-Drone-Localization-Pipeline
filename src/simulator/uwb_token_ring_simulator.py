@@ -51,6 +51,9 @@ class UWBTokenRingSimulator:
 
     def _get_and_send_measurements(self, i):
         measurements, ground_truth = self.trajectories[i].get_measurements()
+        if random.random() < const.SIMULATOR_DROP_RATE:
+            random_key = random.choice(list(measurements.keys()))
+            del measurements[random_key]
         id = f"7{chr(ord('D')+i)}"
         msg = {
             'id': id,
