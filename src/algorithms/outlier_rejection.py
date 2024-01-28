@@ -12,16 +12,18 @@ class OutlierRejection:
 
     def filter_outlier(self, value):
         if any(val and (val < const.NON_OUTLIER_MIN or val > const.NON_OUTLIER_MAX) for val in value.unpack()):
-            self.logger.info(f'\t Outlier: {value.unpack()}')
+            self.logger.info(f'Outlier: {value.unpack()}')
             if self.outlier_replacement and len(self.buffer) >= const.OUTLIER_INTERPOLATION_MIN_BUFFER:
                 value = self._replace_outlier(value)
-                self.logger.info(f'\t Replaced value: {value.unpack()}')
+                self.logger.info(f'Replaced value: {value.unpack()}')
             else:
                 filtered_value = [
                     None if val and (val < const.NON_OUTLIER_MIN or val > const.NON_OUTLIER_MAX) else val
                     for val in value.unpack()
                 ]
                 value.update(*filtered_value)
+                self.logger.info(f'KF value to replace: {value.unpack()}')
+
         return value
     
     def add_to_buffer(self, value):
