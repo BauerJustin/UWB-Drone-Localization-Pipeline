@@ -4,7 +4,7 @@ from src.utils import load_config
 
 class KalmanFilter:
     def __init__(self):
-        kf_settings = load_config.load_kf_settings("measurement")
+        kf_settings = load_config.load_kf_settings()
         self.process_noise = np.array(kf_settings['PROCESS_NOISE'])  # Q
         self.measurement_noise = np.array(kf_settings['MEASUREMENT_NOISE'])  # R
         self.transition_matrix = np.array(kf_settings['TRANSITION_MATRIX'])  # F

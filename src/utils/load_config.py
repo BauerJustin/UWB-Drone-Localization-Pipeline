@@ -18,11 +18,8 @@ def load_network_host(network_config='./config/network_config.json'):
         host = get_local_ip()
     return host, port
 
-def load_kf_settings(base='pos'):
-    base = base.lower()
-    if base != 'pos' and base != 'measurement':
-        raise Exception(f"Invalid base for kalman filter: {base}")
-    kf_config = f'./config/{base}_kf_config.json'
+def load_kf_settings():
+    kf_config = f'./config/kf_config.json'
     with open(kf_config, 'r') as f:
         config = json.load(f)
     return config

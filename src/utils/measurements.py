@@ -1,7 +1,7 @@
 from src import constants as const
 from src.utils import load_config
 
-kf_settings = load_config.load_kf_settings("measurement")
+kf_settings = load_config.load_kf_settings()
 
 class Measurements:
     def __init__(self, d1, d2, d3, d4, d1_dot=0.0, d2_dot=0.0, d3_dot=0.0, d4_dot=0.0, covariance=kf_settings['INITIAL_COVARIANCE'], t=None):
