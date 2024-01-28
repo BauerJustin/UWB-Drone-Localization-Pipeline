@@ -1,13 +1,12 @@
 from src.utils import StreamCapture, load_config
 import numpy as np
-import pprint
 from src import constants as const
 
 class MeasurementAnalyzer:
     def __init__(self, file_name):
         self.file_name = file_name
         self.capture = StreamCapture(self.file_name, replay=False, live=False)
-        self.measurements = self.load_data()
+        self.measurements = self._load_data()
         self.total_data = len(self.measurements)
 
         self.anchors = load_config.load_anchor_positions()
@@ -25,8 +24,9 @@ class MeasurementAnalyzer:
         self.total_complete_data_without_outliers = 0
         self.total_outliers = 0
         self.total_incomplete_data = 0
+        self.logger = load_config.setup_logger(__name__)
 
-    def load_data(self):
+    def _load_data(self):
         data = self.capture.read_stream()
 
         anchor_distances = []
@@ -97,13 +97,13 @@ class MeasurementAnalyzer:
                     break
 
     def print_relevant_details(self):
-        print("**RELEVANT INFO**")
-        print("total_data: ", self.total_data)
-        print("total_outliers: ", self.total_outliers)
-        print("total_data_complete: ", self.total_data_complete)
-        print("total_incomplete_data: ", self.total_incomplete_data)
-        print("total_complete_data_without_outliers: ", self.total_complete_data_without_outliers)
-        print(f'Outliers: {(self.total_outliers/self.total_data) * 100}%')
+        self.logger.info("**MEASUREMENT ANALYZER INFO**")
+        self.logger.info("total_data: %s", self.total_data)
+        self.logger.info("total_outliers: %s", self.total_outliers)
+        self.logger.info("total_data_complete: %s", self.total_data_complete)
+        self.logger.info("total_incomplete_data: %s", self.total_incomplete_data)
+        self.logger.info("total_complete_data_without_outliers: %s", self.total_complete_data_without_outliers)
+        self.logger.info(f'Outliers: {(self.total_outliers/self.total_data) * 100}%')
 
-        print(f'\nOutliers Info for {self.file_name} \n')
-        pprint.PrettyPrinter(indent=4).pprint(self.outlier_data_info)
+        self.logger.info(f'\nOutliers Info for {self.file_name} \n')
+        self.logger.info(self.outlier_data_info)

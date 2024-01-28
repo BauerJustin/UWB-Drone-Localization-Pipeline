@@ -121,7 +121,7 @@ class Visualizer:
                 self.drone_labels[title] = label
             self.drone_labels[title].configure(text=f"{title}: {metric}")
 
-        self.dropped_label.configure(text=f"Dropped packets: {self.tracker.dropped_count}")
+        self.dropped_label.configure(text=f"Dropped measurements: {self.tracker.dropped_measurements}")
 
     def _plot_axes(self):
         self.ax.set_xlabel('X axis [m]')

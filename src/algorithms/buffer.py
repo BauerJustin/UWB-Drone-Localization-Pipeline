@@ -37,3 +37,6 @@ class Buffer:
         deviation = np.median(np.abs(values - median), axis=0)
         return deviation
     
+    def __len__(self):
+        return len(self.buffer)
+    

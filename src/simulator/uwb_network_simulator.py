@@ -1,4 +1,5 @@
 import json
+import random
 import socket
 import threading
 import time
@@ -12,8 +13,10 @@ class UWBNetworkSimulator:
         self.num_drones = num_drones
         self._init_threads()
         self._init_trajectories()
+        self.logger = load_config.setup_logger(__name__)
 
     def start(self):
+        self._init_sockets()
         print(f"[Simulator] Starting for {self.num_drones} drone{'s' if self.num_drones > 1 else ''}")
         for thread in self.threads:
             thread.start()
@@ -25,7 +28,6 @@ class UWBNetworkSimulator:
         print("[Simulator] Terminated by user")
 
     def _run(self):
-        self._init_sockets()
         while not self._stop_event.is_set():
             with self.lock:
                 self._get_and_send_measurements()
@@ -52,6 +54,9 @@ class UWBNetworkSimulator:
 
     def _get_and_send_measurements(self):
         measurements, ground_truth = self.trajectories[self.token].get_measurements()
+        if random.random() < const.SIMULATOR_DROP_RATE:
+            random_key = random.choice(list(measurements.keys()))
+            del measurements[random_key]
         msg = {
             'id': self.token,
             'measurements': measurements,
