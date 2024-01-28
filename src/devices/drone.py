@@ -16,24 +16,25 @@ class Drone:
         if const.MEASURE_VARIANCE:
             self.variance_buffer = Buffer(base_type="pos", size=const.VARIANCE_SIZE)
         if const.OUTLIER_REJECTION_ENABLED:
-            self.outler_rejection = OutlierRejection(const.OUTLIER_INTERPOLATION_ENABLED)
+            self.outlier_rejection = OutlierRejection(const.OUTLIER_INTERPOLATION_ENABLED)
 
         self.has_ground_truth, self.ground_truth = None, None
 
         self.last_update_time = None
         self.update_frequency = 0
-
         self.variance = None
-
         self.active = False
+
+        self.pos = None
 
         self.logger = load_config.setup_logger(__name__)
 
     def update_pos(self, measurements, ground_truth):
         self.logger.info(f'\n***DRONE {self.id}***')
+        self.logger.info(f'Incoming measurement: {measurements.unpack()}')
 
         if const.OUTLIER_REJECTION_ENABLED:
-            measurements = self.outler_rejection.filter_outlier(measurements)
+            measurements = self.outlier_rejection.filter_outlier(measurements)
             if measurements is None:
                 return
 
@@ -46,10 +47,10 @@ class Drone:
         self.logger.info(f'*New Measurement: {self.measurements.unpack()}')
 
         if const.OUTLIER_INTERPOLATION_ENABLED and self.active:
-            self.outler_rejection.add_to_buffer(self.measurements)
+            self.outlier_rejection.add_to_buffer(self.measurements)
 
         if self.active:
-            self.pos = self.multilaterator.calculate_position(self.measurements, last_pos=self.pos if hasattr(self, 'pos') else None)
+            self.pos = self.multilaterator.calculate_position(self.measurements, last_pos=self.pos)
             self.logger.info(f'*New Pos: {self.pos.unpack()}')
 
         self._update_stats()
@@ -71,7 +72,9 @@ class Drone:
         return self.ground_truth
     
     def get_euclid_dist(self):
-        return math.sqrt((self.pos.x - self.ground_truth.x)**2 + (self.pos.y - self.ground_truth.y)**2 + (self.pos.z - self.ground_truth.z)**2)
+        if self.pos is not None and self.ground_truth is not None:
+            return math.sqrt((self.pos.x - self.ground_truth.x)**2 + (self.pos.y - self.ground_truth.y)**2 + (self.pos.z - self.ground_truth.z)**2)
+        return None
     
     def _update_stats(self):
         if self.active:

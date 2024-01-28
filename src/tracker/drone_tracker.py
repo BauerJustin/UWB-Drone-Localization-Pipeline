@@ -36,6 +36,8 @@ class DroneTracker:
             else:
                 self.capture_thread = threading.Thread(target=self._save_capture)
                 self.captured_stream = []            
+        
+        self.logger = load_config.setup_logger(__name__)
 
     def start(self):
         self.socket.start()
@@ -62,11 +64,9 @@ class DroneTracker:
         if id not in self.drones:
             self._add_drone(id)
         if len(measurements) != 4:
-            self.dropped_measurements += 4 - len(measurements)
-            if const.DROP_PARTIAL_MEASUREMENTS:
-                print(f'[Tracker] Drone {id} Invalid measurements len = {len(measurements)}, dropping packet')
-                return
-        self.drones[id].update_pos(measurements=Measurements(*[measurements[anchor_id] if anchor_id in measurements else None for anchor_id in self.anchor_network.get_anchor_ids()], t=timestamp), ground_truth=ground_truth)
+            self._handle_invalid_measurements(id, measurements)
+            return
+        self.drones[id].update_pos(measurements=self._create_measurements(measurements, timestamp), ground_truth=ground_truth)
         if self.capture and not self.capture.replay:
             self.captured_stream.append((time.time(), data))
         if self.history and self.drones[id].active:
@@ -78,19 +78,33 @@ class DroneTracker:
             self.drones_history[id] = []
 
     def _save_capture(self):
-        if not self.shutdown_event.is_set():
-            self.capture.write_stream(self.captured_stream)
-            time.sleep(1)
-            self._save_capture()
-
+        try:
+            if not self.shutdown_event.is_set():
+                self.capture.write_stream(self.captured_stream)
+                time.sleep(1)
+                self._save_capture()
+        except Exception as e:
+            self.logger.error(f"Exception in _save_capture: {e}")
+    
     def _replay_capture(self):
-        for i in range(len(self.stream)):
-            if self.shutdown_event.is_set():
-                break
-            curr_time, data = self.stream[i]
-            if 'timestamp' not in data:
-                data['timestamp'] = curr_time
-            self.update_drone(data)
-            if self.capture.live and i+1 < len(self.stream):
-                next_time, _ = self.stream[i+1]
-                time.sleep(next_time - curr_time)
+        try:
+            for i in range(len(self.stream)):
+                if self.shutdown_event.is_set():
+                    break
+                curr_time, data = self.stream[i]
+                if 'timestamp' not in data:
+                    data['timestamp'] = curr_time
+                self.update_drone(data)
+                if self.capture.live and i+1 < len(self.stream):
+                    next_time, _ = self.stream[i+1]
+                    time.sleep(next_time - curr_time)
+        except Exception as e:
+            self.logger.error(f"Exception in _replay_capture: {e}")
+
+    def _create_measurements(self, measurements, timestamp):
+        return Measurements(*[measurements[anchor_id] if anchor_id in measurements else None for anchor_id in self.anchor_network.get_anchor_ids()], t=timestamp)
+
+    def _handle_invalid_measurements(self, id, measurements):
+        self.dropped_measurements += 4 - len(measurements)
+        if const.DROP_PARTIAL_MEASUREMENTS:
+            self.logger.info(f'[Tracker] Drone {id} Invalid measurements len = {len(measurements)}, dropping packet')

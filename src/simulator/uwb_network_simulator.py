@@ -13,6 +13,7 @@ class UWBNetworkSimulator:
         self.num_drones = num_drones
         self._init_threads()
         self._init_trajectories()
+        self.logger = load_config.setup_logger(__name__)
 
     def start(self):
         self._init_sockets()
@@ -66,4 +67,4 @@ class UWBNetworkSimulator:
             msg_json = json.dumps(msg)
             self.sockets[self.token].sendto(msg_json.encode('utf-8'), (self.host, self.port))
         except Exception as e:
-            print(f"[Simulator] Error sending message: {str(e)}")
+            self.logger.error(f"[Simulator] Error sending message: {str(e)}")
