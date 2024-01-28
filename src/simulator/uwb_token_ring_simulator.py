@@ -67,7 +67,6 @@ class UWBTokenRingSimulator:
             self.sockets[i].sendall(msg_json.encode('utf-8'))
             self.sockets[i].recv(1024)
         except Exception as e:
-            self.logger.error(f"[Simulator] Error sending message: {str(e)}")
             print(f"[Simulator] Reconnecting tag {id}")
             self.sockets[i] = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.sockets[i].connect((self.host, self.port))

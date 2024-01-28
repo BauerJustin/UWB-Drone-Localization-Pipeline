@@ -67,4 +67,4 @@ class UWBNetworkSimulator:
             msg_json = json.dumps(msg)
             self.sockets[self.token].sendto(msg_json.encode('utf-8'), (self.host, self.port))
         except Exception as e:
-            self.logger.error(f"[Simulator] Error sending message: {str(e)}")
+            print(f"[Simulator] Error sending message: {str(e)}")

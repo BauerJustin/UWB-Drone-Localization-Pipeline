@@ -64,8 +64,10 @@ class DroneTracker:
         if id not in self.drones:
             self._add_drone(id)
         if len(measurements) != 4:
-            self._handle_invalid_measurements(id, measurements)
-            return
+            self.dropped_measurements += 4 - len(measurements)
+            if const.DROP_PARTIAL_MEASUREMENTS:
+                print(f'[Tracker] Drone {id} Invalid measurements len = {len(measurements)}, dropping packet')
+                return
         self.drones[id].update_pos(measurements=self._create_measurements(measurements, timestamp), ground_truth=ground_truth)
         if self.capture and not self.capture.replay:
             self.captured_stream.append((time.time(), data))
@@ -77,6 +79,9 @@ class DroneTracker:
         if self.history:
             self.drones_history[id] = []
 
+    def _create_measurements(self, measurements, timestamp):
+        return Measurements(*[measurements[anchor_id] if anchor_id in measurements else None for anchor_id in self.anchor_network.get_anchor_ids()], t=timestamp)
+
     def _save_capture(self):
         try:
             if not self.shutdown_event.is_set():
@@ -84,7 +89,7 @@ class DroneTracker:
                 time.sleep(1)
                 self._save_capture()
         except Exception as e:
-            self.logger.error(f"Exception in _save_capture: {e}")
+            print(f"[Tracker] Save capture failed: {e}")
     
     def _replay_capture(self):
         try:
@@ -99,12 +104,4 @@ class DroneTracker:
                     next_time, _ = self.stream[i+1]
                     time.sleep(next_time - curr_time)
         except Exception as e:
-            self.logger.error(f"Exception in _replay_capture: {e}")
-
-    def _create_measurements(self, measurements, timestamp):
-        return Measurements(*[measurements[anchor_id] if anchor_id in measurements else None for anchor_id in self.anchor_network.get_anchor_ids()], t=timestamp)
-
-    def _handle_invalid_measurements(self, id, measurements):
-        self.dropped_measurements += 4 - len(measurements)
-        if const.DROP_PARTIAL_MEASUREMENTS:
-            self.logger.info(f'[Tracker] Drone {id} Invalid measurements len = {len(measurements)}, dropping packet')
+            print(f"[Tracker] Replay capture failed: {e}")
