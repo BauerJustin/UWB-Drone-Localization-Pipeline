@@ -1,3 +1,6 @@
+# Anchor positions
+ANCHOR_CONFIG = 'jan29_anchor_config.json'
+
 # Drone Tracker
 DROP_PARTIAL_MEASUREMENTS = False
 

@@ -2,8 +2,10 @@ import json
 import logging
 import os
 import socket
+from src import constants as const
 
-def load_anchor_positions(anchor_config='./config/anchor_config.json'):
+
+def load_anchor_positions(anchor_config=f'./config/{const.ANCHOR_CONFIG}'):
     with open(anchor_config, 'r') as f:
         config = json.load(f)
     config = {k: config[k] for k in sorted(config.keys())}  # sort based on key
