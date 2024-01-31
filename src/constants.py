@@ -24,6 +24,14 @@ USE_LAST_POS = True
 # MA settings
 MOVING_AVG_FILTER_RATE = 0.9
 
+# Accuracy evaluation ground truth
+GROUND_TRUTH_STATIC_POS = {
+    '7D': (1.86, 1.62, 0.74)
+}
+GROUND_TRUTH_LINEAR_PATH = {  # Start to Finish
+    '7D': ((2.87, 1.62, 0.74), (2.87, 1.62, 1.54))
+}
+
 # Simulator
 SIMULATOR_PROCESSING_MIN, SIMULATOR_PROCESSING_MAX = 0.05, 0.2  # TokenRing
 SIMULATOR_FREQUENCY = 10  # Network

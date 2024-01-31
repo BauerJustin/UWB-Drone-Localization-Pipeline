@@ -1,6 +1,5 @@
 import socket
 import json
-import time
 import threading
 from src.utils import load_config
 from src import constants as const

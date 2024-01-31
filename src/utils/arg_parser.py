@@ -8,6 +8,8 @@ class Parser:
         parser.add_argument("--capture", help="Capture all incoming data", action="store_true")
         parser.add_argument("--replay", help="Replay capture file", action="store_true")
         parser.add_argument("--file_name", help="Set capture file (default=capture.json)", default="capture.json")
+        parser.add_argument("--static", help="Measure static accuracy", action="store_true")
+        parser.add_argument("--linear", help="Measure linear accuracy", action="store_true")
         args = parser.parse_args()
         self._validate_args(args)
         return args
