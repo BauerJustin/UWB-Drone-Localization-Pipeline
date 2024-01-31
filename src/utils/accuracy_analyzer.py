@@ -21,6 +21,7 @@ class AccuracyAnalyzer:
             raise Exception("Invalid mode")
         
     def _evaluate_static_accuracy(self):
+        drone_metrics = {}
         for drone_id, history in self.tracker.drones_history.items():
             ground_truth = Position(*const.GROUND_TRUTH_STATIC_POS[drone_id])
             errors, times = [], []
@@ -31,18 +32,18 @@ class AccuracyAnalyzer:
             
             mean = np.mean(errors)
             std = np.std(errors)
-            print(f'{drone_id}\nError mean: {mean}, Error std: {std}')
+            print(f'{drone_id}: Error mean: {mean}, Error std: {std}')
+            
+            drone_metrics[drone_id] = {
+                'errors': errors,
+                'times': times
+            }
 
-            if self.plot_on:
-                plt.figure()
-                plt.plot(times, errors, label='Errors')
-                plt.xlabel('Time')
-                plt.ylabel('Error [cm]')
-                plt.title(f'Error Plot for Drone {drone_id}')
-                plt.legend()
-                plt.show()
+        if self.plot_on:
+            self._plot_metrics(drone_metrics)
 
     def _evaluate_linear_accuracy(self):
+        drone_metrics = {}
         for drone_id, history in self.tracker.drones_history.items():
             start_point = np.array(const.GROUND_TRUTH_LINEAR_PATH[drone_id][0])
             end_point = np.array(const.GROUND_TRUTH_LINEAR_PATH[drone_id][1])
@@ -57,16 +58,15 @@ class AccuracyAnalyzer:
             mean = np.mean(errors)
             std = np.std(errors)
 
-            print(f'{drone_id}\nError mean: {mean}, Error std: {std}')
+            print(f'{drone_id}: Error mean: {mean}, Error std: {std}')
 
-            if self.plot_on:
-                plt.figure()
-                plt.plot(times, errors, label='Errors')
-                plt.xlabel('Time')
-                plt.ylabel('Error [cm]')
-                plt.title(f'Error Plot for Drone {drone_id}')
-                plt.legend()
-                plt.show()
+            drone_metrics[drone_id] = {
+                'errors': errors,
+                'times': times
+            }
+
+        if self.plot_on:
+            self._plot_metrics(drone_metrics)
 
     def _get_euclid_dist(self, pos, ground_truth):
         return math.sqrt((pos.x - ground_truth.x)**2 + (pos.y - ground_truth.y)**2 + (pos.z - ground_truth.z)**2)
@@ -77,3 +77,15 @@ class AccuracyAnalyzer:
         t = max(0, min(1, t))
         closest_point = start_point + t * line_dir
         return Position(*closest_point)
+    
+    def _plot_metrics(self, drone_metrics):
+        plt.figure()
+        for drone_id, data in drone_metrics.items():
+            errors = data['errors']
+            times = data['times']
+            plt.plot(times, errors, label=f'{drone_id}')
+        plt.xlabel('Time')
+        plt.ylabel('Error [cm]')
+        plt.title(f'Error Plot')
+        plt.legend()
+        plt.show()
