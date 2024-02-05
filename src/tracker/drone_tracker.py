@@ -65,6 +65,11 @@ class DroneTracker:
             self._add_drone(id)
         if len(measurements) != 4:
             self.dropped_measurements += 4 - len(measurements)
+            dropped_anchors = []
+            for anchor_id in self.anchor_network.get_anchor_ids():
+                if anchor_id not in measurements:
+                    dropped_anchors.append(anchor_id)
+            print(f'[Tracker] Drone {id} dropped anchors: {dropped_anchors}')
             if const.DROP_PARTIAL_MEASUREMENTS:
                 print(f'[Tracker] Drone {id} Invalid measurements len = {len(measurements)}, dropping packet')
                 return
