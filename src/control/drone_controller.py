@@ -13,6 +13,8 @@ class DroneController:
 #        drone_thread2 = threading.Thread(target=self._drone_swarm_2)
 #        drone_thread3 = threading.Thread(target=self._drone_swarm_3)
         drone_thread1.start()
+        drone_thread1.join()
+        
 #        drone_thread2.start()
 #        drone_thread3.start()
 
@@ -40,10 +42,18 @@ class DroneController:
         
         drone1.sendto('command'.encode("utf-8"), 0, ('192.168.10.1', 8889))
         drone1.sendto('takeoff'.encode("utf-8"), 0, ('192.168.10.1', 8889))
-#        time.sleep(5)
+        temp = drone1.recvfrom(1024)
+        print(temp)
+        time.sleep(2)
+        drone1.sendto('command'.encode("utf-8"), 0, ('192.168.10.1', 8889))
+        drone1.sendto('forward 100'.encode("utf-8"), 0, ('192.168.10.1', 8889))
         
         drone1.sendto('command'.encode("utf-8"), 0, ('192.168.10.1', 8889))
         drone1.sendto('land'.encode("utf-8"), 0, ('192.168.10.1', 8889))
+        temp2 = drone1.recvfrom(1024)
+        print(temp2)
+        time.sleep(2)
+        print("Drone 1 Thread Stopped")
     
     def _drone_swarm_2(self):
         print("Drone 2 Thread Started")
@@ -52,10 +62,12 @@ class DroneController:
         
         drone2.sendto('command'.encode("utf-8"), 0, ('192.168.10.1', 8889))
         drone2.sendto('takeoff'.encode("utf-8"), 0, ('192.168.10.1', 8889))
-#        time.sleep(5)
+        time.sleep(2)
 
-        drone2.sendto('command'.encode("utf-8"), 0, ('192.168.10.1', 8889))
+#        drone2.sendto('command'.encode("utf-8"), 0, ('192.168.10.1', 8889))
         drone2.sendto('land'.encode("utf-8"), 0, ('192.168.10.1', 8889))
+        time.sleep(2)
+        print("Drone 2 Thread Stopped")
     
     def _drone_swarm_3(self):
         print("Drone 3 Thread Started")
@@ -64,8 +76,10 @@ class DroneController:
         
         drone2.sendto('command'.encode("utf-8"), 0, ('192.168.10.1', 8889))
         drone2.sendto('takeoff'.encode("utf-8"), 0, ('192.168.10.1', 8889))
-#        time.sleep(5)
+        time.sleep(2)
 
-        drone2.sendto('command'.encode("utf-8"), 0, ('192.168.10.1', 8889))
+#        drone2.sendto('command'.encode("utf-8"), 0, ('192.168.10.1', 8889))
         drone2.sendto('land'.encode("utf-8"), 0, ('192.168.10.1', 8889))
+        time.sleep(2)
+        print("Drone 3 Thread Stopped")
 
