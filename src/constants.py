@@ -2,6 +2,7 @@
 ANCHOR_CONFIG = 'jan29_anchor_config.json'
 
 # Drone Tracker
+FILTER_DUPLICATE_MEASUREMENTS = True
 DROP_PARTIAL_MEASUREMENTS = False
 
 FILTER_TYPE = "KF"  # MA (Moving Average), KF (Kalman Filter) - to disable set MA with 1.0

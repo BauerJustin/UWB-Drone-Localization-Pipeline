@@ -22,6 +22,7 @@ class DroneTracker:
             self.anchor_network.add_anchor(anchor_id, **pos)
 
         self.dropped_measurements = 0
+        self.last_measurements = {}
 
         self.capture = capture
         self.history = False
@@ -63,6 +64,8 @@ class DroneTracker:
         id, measurements, timestamp, ground_truth = data['id'], data['measurements'], data['timestamp'], data.get('ground_truth')
         if id not in self.drones:
             self._add_drone(id)
+        if const.FILTER_DUPLICATE_MEASUREMENTS:
+            measurements = self._filter_measurements(measurements)
         if len(measurements) != 4:
             self.dropped_measurements += 4 - len(measurements)
             dropped_anchors = []
@@ -95,6 +98,14 @@ class DroneTracker:
                 self._save_capture()
         except Exception as e:
             print(f"[Tracker] Save capture failed: {e}")
+
+    def _filter_measurements(self, measurements):
+        filtered_measurements = {}
+        for anchor_id, measurement in measurements.items():
+            if anchor_id not in self.last_measurements or self.last_measurements[anchor_id] != measurement:
+                filtered_measurements[anchor_id] = measurement
+            self.last_measurements[anchor_id] = measurement
+        return filtered_measurements
     
     def _replay_capture(self):
         try:
