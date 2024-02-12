@@ -81,12 +81,15 @@ class AccuracyAnalyzer:
     
     def _plot_metrics(self, drone_metrics):
         plt.figure()
+        max_end_time = max([data['times'][-1] for data in drone_metrics.values()])
         for drone_id, data in drone_metrics.items():
             errors = data['errors']
             times = data['times']
-            plt.plot(times, errors, label=f'{drone_id}')
+            t_shift = max_end_time - times[-1]
+            times_shifted = [t + t_shift for t in times]
+            plt.plot(times_shifted, errors, label=f'{drone_id}')
         plt.xlabel('Time')
         plt.ylabel('Error [cm]')
-        plt.title(f'Error Plot')
+        plt.title('Error Plot')
         plt.legend()
         plt.show()
