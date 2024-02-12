@@ -5,8 +5,14 @@ import socket
 from src import constants as const
 
 
-def load_anchor_positions(anchor_config=f'./config/{const.ANCHOR_CONFIG}'):
+def load_anchor_positions(anchor_config=f'./config/{const.CONFIG_DATE}/anchor_config.json'):
     with open(anchor_config, 'r') as f:
+        config = json.load(f)
+    config = {k: config[k] for k in sorted(config.keys())}  # sort based on key
+    return config
+
+def load_ground_truth(ground_truth_config=f'./config/{const.CONFIG_DATE}/ground_truth_config.json'):
+    with open(ground_truth_config, 'r') as f:
         config = json.load(f)
     config = {k: config[k] for k in sorted(config.keys())}  # sort based on key
     return config

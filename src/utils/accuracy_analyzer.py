@@ -1,5 +1,5 @@
 from src import constants as const
-from src.utils import Position
+from src.utils import Position, load_config
 import math
 import matplotlib.pyplot as plt
 import numpy as np
@@ -11,6 +11,7 @@ class AccuracyAnalyzer:
         self.static = static
         self.linear = linear
         self.plot_on = plot_on
+        self.ground_truth = load_config.load_ground_truth()
 
     def evaluate_accuracy(self):
         if self.static:
@@ -23,7 +24,7 @@ class AccuracyAnalyzer:
     def _evaluate_static_accuracy(self):
         drone_metrics = {}
         for drone_id, history in self.tracker.drones_history.items():
-            ground_truth = Position(*const.GROUND_TRUTH_STATIC_POS[drone_id])
+            ground_truth = Position(*self.ground_truth['static'][drone_id])
             errors, times = [], []
             for pos in history:
                 error = self._get_euclid_dist(pos, ground_truth) * 100  # convert to cm
@@ -45,8 +46,8 @@ class AccuracyAnalyzer:
     def _evaluate_linear_accuracy(self):
         drone_metrics = {}
         for drone_id, history in self.tracker.drones_history.items():
-            start_point = np.array(const.GROUND_TRUTH_LINEAR_PATH[drone_id][0])
-            end_point = np.array(const.GROUND_TRUTH_LINEAR_PATH[drone_id][1])
+            start_point = np.array(self.ground_truth['linear'][drone_id][0])
+            end_point = np.array(self.ground_truth['linear'][drone_id][1])
 
             errors, times = [], []
             for pos in history:

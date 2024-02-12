@@ -1,5 +1,5 @@
 # Anchor positions
-ANCHOR_CONFIG = 'jan29_anchor_config.json'
+CONFIG_DATE = 'feb12'
 
 # Drone Tracker
 FILTER_DUPLICATE_MEASUREMENTS = True
@@ -24,18 +24,6 @@ USE_LAST_POS = True
 
 # MA settings
 MOVING_AVG_FILTER_RATE = 0.9
-
-# Accuracy evaluation ground truth
-GROUND_TRUTH_STATIC_POS = {
-    '7D': (1.86, 1.62, 0.74),
-    '7E': (1.86, 1.62, 0.74),
-    '7F': (1.86, 1.62, 0.74),
-}
-GROUND_TRUTH_LINEAR_PATH = {  # Start to Finish
-    '7D': ((2.87, 1.62, 0.74), (2.87, 1.62, 1.54)),
-    '7E': ((2.87, 1.62, 0.74), (2.87, 1.62, 1.54)),
-    '7F': ((2.87, 1.62, 0.74), (2.87, 1.62, 1.54)),
-}
 
 # Simulator
 SIMULATOR_PROCESSING_MIN, SIMULATOR_PROCESSING_MAX = 0.125, 0.25  # TokenRing

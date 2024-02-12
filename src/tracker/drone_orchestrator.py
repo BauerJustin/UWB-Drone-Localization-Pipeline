@@ -15,6 +15,7 @@ class DroneOrchestrator:
         self.lock = threading.Lock()
 
     def start(self):
+        self.tracker_socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
         self.tracker_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.tracker_socket.bind((self.host, self.port))
         self.tracker_socket.listen()
@@ -29,7 +30,14 @@ class DroneOrchestrator:
 
     def _accept_connections(self):
         while not self.shutdown_event.is_set():
-            tag_socket, tag_address = self.tracker_socket.accept()
+            try:
+                tag_socket, tag_address = self.tracker_socket.accept()
+            except OSError as e:
+                if self.shutdown_event.is_set():
+                    break
+                print(f"Error accepting connection: {e}")
+            except Exception as e:
+                print(f"Unexpected error accepting connection: {e}")
 
             client_thread = threading.Thread(target=self._handle_connection, args=(tag_socket, tag_address))
             client_thread.start()
