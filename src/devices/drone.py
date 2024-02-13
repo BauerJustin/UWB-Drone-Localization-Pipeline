@@ -22,6 +22,7 @@ class Drone:
 
         self.last_update_time = None
         self.update_frequency = 0
+        self.update_frequencies = []
         self.variance = None
         self.active = False
 
@@ -63,7 +64,10 @@ class Drone:
         return self.pos
 
     def get_update_frequency(self):
-        return self.update_frequency
+        if const.UPDATE_FREQ_AVG and len(self.update_frequencies) > 0:
+            return sum(self.update_frequencies) / len(self.update_frequencies)
+        else:
+            return self.update_frequency
     
     def get_variance(self):
         return self.variance
@@ -86,6 +90,9 @@ class Drone:
         if self.last_update_time is not None:
             time_interval = current_time - self.last_update_time
             self.update_frequency = 1 / time_interval
+            self.update_frequencies.append(self.update_frequency)
+            if len(self.update_frequencies) > const.UPDATE_FREQ_BUFFER_SIZE:
+                self.update_frequencies.pop(0)
 
         self.last_update_time = current_time
 
