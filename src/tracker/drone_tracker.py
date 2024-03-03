@@ -65,7 +65,7 @@ class DroneTracker:
         if id not in self.drones:
             self._add_drone(id)
         if const.FILTER_DUPLICATE_MEASUREMENTS:
-            measurements = self._filter_measurements(measurements)
+            measurements = self._filter_measurements(id, measurements)
         if len(measurements) != 4:
             self.dropped_measurements += 4 - len(measurements)
             dropped_anchors = []
@@ -99,12 +99,14 @@ class DroneTracker:
         except Exception as e:
             print(f"[Tracker] Save capture failed: {e}")
 
-    def _filter_measurements(self, measurements):
+    def _filter_measurements(self, id, measurements):
         filtered_measurements = {}
         for anchor_id, measurement in measurements.items():
-            if anchor_id not in self.last_measurements or self.last_measurements[anchor_id] != measurement:
+            if id not in self.last_measurements:
+                self.last_measurements[id] = {}
+            if anchor_id not in self.last_measurements[id] or self.last_measurements[id][anchor_id] != measurement:
                 filtered_measurements[anchor_id] = measurement
-            self.last_measurements[anchor_id] = measurement
+            self.last_measurements[id][anchor_id] = measurement
         return filtered_measurements
     
     def _replay_capture(self):
