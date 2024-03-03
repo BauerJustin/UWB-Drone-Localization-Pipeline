@@ -89,6 +89,8 @@ class Drone:
         current_time = time.time()
         if self.last_update_time is not None:
             time_interval = current_time - self.last_update_time
+            if const.PRINT_TIME_INTERVALS:
+                print(f"{self.id}: {time_interval}")
             self.update_frequency = 1 / time_interval
             self.update_frequencies.append(self.update_frequency)
             if len(self.update_frequencies) > const.UPDATE_FREQ_BUFFER_SIZE:
