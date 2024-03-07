@@ -64,7 +64,7 @@ class DroneTracker:
         id, measurements, timestamp, ground_truth = data['id'], data['measurements'], data['timestamp'], data.get('ground_truth')
         if id not in self.drones:
             self._add_drone(id)
-        if const.FILTER_DUPLICATE_MEASUREMENTS:
+        if const.FILTER_DUPLICATE_MEASUREMENTS and self.drones[id].active:
             measurements = self._filter_measurements(id, measurements)
         if len(measurements) != 4:
             self.dropped_measurements += 4 - len(measurements)
