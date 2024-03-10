@@ -36,11 +36,22 @@ class DroneController:
         print("Battery:", tello.get_battery(), "%")
 
         tello.takeoff()
+        time.sleep(3) # Wait for system to stabalize localization
+
+        tello.set_speed(10)
+
+        for _ in range(5):
+            tello.move_forward(20)
+            time.sleep(2)
+        time.sleep(5)
+
+        for _ in range(5):
+            tello.move_back(20)
+            time.sleep(2)
+        time.sleep(5)
+
         tello.land()
         tello.end()
-
-    def _drone_single_calibration(self):
-        pass
 
     def _drone_swarm(self, wifi, num):
         print(f'Drone {num} Thread Started')
@@ -82,6 +93,14 @@ class DroneController:
         self._drone_socket_send(drone_socket, 'land')
 
         print(f'Drone-tag {num} calibration stopped')
+
+    def _drone_single_calibration(self):
+        tello = Tello()
+        tello.connect()
+        print("Battery:", tello.get_battery(), "%")
+        tello.takeoff()
+        tello.land()
+        tello.end()
 
     def _drone_socket_send(self, drone_socket, command):
         drone_socket.sendto(command.encode("utf-8"), 0, self.drone_network)
