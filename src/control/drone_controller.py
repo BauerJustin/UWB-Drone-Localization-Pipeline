@@ -1,4 +1,5 @@
 from src import constants as const
+from src.utils import load_config
 from djitellopy import Tello
 import time
 import socket
@@ -8,8 +9,7 @@ import multiprocessing
 class DroneController:
     def __init__(self):
         if const.SWARM_MODE:
-            self.drone_network = const.DRONE_NETWORK
-            drone_wifi_ids = const.DRONE_WIFI_IDS
+            self.drone_network, drone_wifi_ids = load_config.load_control_settings()
             self.drone_processes = []
             for i, wifi_id in enumerate(drone_wifi_ids):
                 if const.DRONE_CALIBRATION:

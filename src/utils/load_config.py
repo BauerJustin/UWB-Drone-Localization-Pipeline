@@ -32,6 +32,14 @@ def load_kf_settings():
         config = json.load(f)
     return config
 
+def load_control_settings():
+    drone_config = f'./config/drone_config.json'
+    with open(drone_config, 'r') as f:
+        config = json.load(f)
+    drone_network = (config['drone_host'], config['drone_port'])
+    wifi_ids = config['wifi_ids']
+    return drone_network, wifi_ids
+
 def setup_logger(module_name):
     logger = logging.getLogger(module_name)
     logger.setLevel(logging.INFO)
