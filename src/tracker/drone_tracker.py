@@ -64,6 +64,8 @@ class DroneTracker:
         id, measurements, timestamp, ground_truth = data['id'], data['measurements'], data['timestamp'], data.get('ground_truth')
         if id not in self.drones:
             self._add_drone(id)
+        if const.PRINT_RAW_MEASUREMENTS:
+            print(f'[Tracker] Drone {id} raw measurements: {measurements}')
         if const.FILTER_DUPLICATE_MEASUREMENTS and self.drones[id].active:
             measurements = self._filter_measurements(id, measurements)
         if len(measurements) != 4:
@@ -72,7 +74,7 @@ class DroneTracker:
             for anchor_id in self.anchor_network.get_anchor_ids():
                 if anchor_id not in measurements:
                     dropped_anchors.append(anchor_id)
-            print(f'[Tracker] Drone {id} dropped anchors: {dropped_anchors}')
+            print(f'[Tracker] Drone {id} dropped anchors: {", ".join(dropped_anchors)}')
             if const.DROP_PARTIAL_MEASUREMENTS:
                 print(f'[Tracker] Drone {id} Invalid measurements len = {len(measurements)}, dropping packet')
                 return
