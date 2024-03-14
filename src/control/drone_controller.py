@@ -40,13 +40,19 @@ class DroneController:
 
         tello.set_speed(10)
 
-        for _ in range(5):
-            tello.move_forward(20)
+        for _ in range(3):
+            # tello.move_forward(20)
+            tello.send_rc_control(0, 20, 0, 0)
+            time.sleep(2)
+            tello.send_rc_control(0, 0, 0, 0)
             time.sleep(2)
         time.sleep(5)
 
-        for _ in range(5):
-            tello.move_back(20)
+        for _ in range(3):
+#            tello.move_back(20)
+            tello.send_rc_control(0, -20, 0, 0)
+            time.sleep(2)
+            tello.send_rc_control(0, 0, 0, 0)
             time.sleep(2)
         time.sleep(5)
 
