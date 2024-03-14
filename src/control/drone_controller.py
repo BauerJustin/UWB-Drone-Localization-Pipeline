@@ -27,10 +27,24 @@ class DroneController:
             print(f"[Controller] Single drone activated")
             if const.DRONE_CALIBRATION:
                 self._drone_single_calibration()
+            elif const.DRONE_DYNAMIC:
+                self._drone_single_dynamic()
             else:
-                self._drone_single()
+                self._drone_single_static()
 
-    def _drone_single(self):
+
+    def _drone_single_static(self):
+        tello = Tello()
+        tello.connect()
+        print("Battery:", tello.get_battery(), "%")
+
+        tello.takeoff()
+        time.sleep(30)
+
+        tello.land()
+        tello.end()
+
+    def _drone_single_dynamic(self):
         tello = Tello()
         tello.connect()
         print("Battery:", tello.get_battery(), "%")
