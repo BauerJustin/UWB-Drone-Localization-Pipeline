@@ -14,7 +14,7 @@ class DroneController:
             for i, wifi_id in enumerate(drone_wifi_ids):
                 if const.DRONE_CALIBRATION:
                     self.drone_processes.append(multiprocessing.Process(target=self._drone_swarm_calibration, args=(wifi_id, i+1)))
-                elif const.DRONE_SWARM_STATIC:
+                elif const.DRONE_STATIC:
                     self.drone_processes.append(multiprocessing.Process(target=self._drone_swarm_static, args=(wifi_id, i+1)))
                 else:
                     self.drone_processes.append(multiprocessing.Process(target=self._drone_swarm_dynamic, args=(wifi_id, i+1)))

@@ -109,10 +109,11 @@ class Visualizer:
 
         metrics = {}
         metrics[f'Freq {id}'] = f'{drone.get_update_frequency():.2f} Hz'
-        drone_var = drone.get_variance()
-        metrics[f'X_var {id}'] = f'{drone_var[0]:.2f} m'
-        metrics[f'Y_var {id}'] = f'{drone_var[1]:.2f} m'
-        metrics[f'Z_var {id}'] = f'{drone_var[2]:.2f} m'
+        if drone.active:
+            drone_var = drone.get_variance()
+            metrics[f'X_var {id}'] = f'{drone_var[0]:.2f} m'
+            metrics[f'Y_var {id}'] = f'{drone_var[1]:.2f} m'
+            metrics[f'Z_var {id}'] = f'{drone_var[2]:.2f} m'
 
         for title, metric in metrics.items():
             if title not in self.drone_labels:
