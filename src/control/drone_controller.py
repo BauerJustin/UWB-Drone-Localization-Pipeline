@@ -14,8 +14,10 @@ class DroneController:
             for i, wifi_id in enumerate(drone_wifi_ids):
                 if const.DRONE_CALIBRATION:
                     self.drone_processes.append(multiprocessing.Process(target=self._drone_swarm_calibration, args=(wifi_id, i+1)))
+                elif const.DRONE_SWARM_STATIC:
+                    self.drone_processes.append(multiprocessing.Process(target=self._drone_swarm_static, args=(wifi_id, i+1)))
                 else:
-                    self.drone_processes.append(multiprocessing.Process(target=self._drone_swarm, args=(wifi_id, i+1)))
+                    self.drone_processes.append(multiprocessing.Process(target=self._drone_swarm_dynamic, args=(wifi_id, i+1)))
 
     def start(self):
         print(f"[Controller] Started")
@@ -27,10 +29,10 @@ class DroneController:
             print(f"[Controller] Single drone activated")
             if const.DRONE_CALIBRATION:
                 self._drone_single_calibration()
-            elif const.DRONE_DYNAMIC:
-                self._drone_single_dynamic()
-            else:
+            elif const.DRONE_STATIC:
                 self._drone_single_static()
+            else:
+                self._drone_single_dynamic()
 
 
     def _drone_single_static(self):
@@ -39,7 +41,7 @@ class DroneController:
         print("Battery:", tello.get_battery(), "%")
 
         tello.takeoff()
-        time.sleep(30)
+        time.sleep(60)
 
         tello.land()
         tello.end()
@@ -73,7 +75,24 @@ class DroneController:
         tello.land()
         tello.end()
 
-    def _drone_swarm(self, wifi, num):
+
+    def _drone_swarm_static(self, wifi, num):
+        print(f'Drone {num} Thread Started')
+        drone_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        drone_socket.setsockopt(socket.SOL_SOCKET, 25, wifi.encode())
+        
+        self._drone_socket_send(drone_socket, 'command')
+        self._drone_socket_send(drone_socket, 'takeoff')
+
+        for _ in range(30):
+            self._drone_socket_send(drone_socket, 'command')
+            time.sleep(2)
+
+        self._drone_socket_send(drone_socket, 'land')
+
+        print(f'Drone {num} Thread Stopped')
+
+    def _drone_swarm_dynamic(self, wifi, num):
         print(f'Drone {num} Thread Started')
         drone_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         drone_socket.setsockopt(socket.SOL_SOCKET, 25, wifi.encode())
