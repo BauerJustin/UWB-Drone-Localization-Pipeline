@@ -1,5 +1,5 @@
 # Anchor positions
-CONFIG_DATE = 'feb12'
+CONFIG_DATE = 'mar17'
 
 # Drone Tracker
 FILTER_DUPLICATE_MEASUREMENTS = True
