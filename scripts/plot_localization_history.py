@@ -16,7 +16,7 @@ def main():
     tracker.stop()
 
     visualizer = Visualizer(tracker)
-    visualizer.plot_history(plot_best_fit=True)
+    visualizer.plot_history(plot_best_fit=False)
 
 if __name__ == "__main__":
     main()
